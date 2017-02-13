@@ -1,11 +1,11 @@
 <apex:page controller="ResourcesAndAvailabilityController"
     showHeader="true"
     sidebar="false"
-    title="Resources&amp;Availability"
+    title="Resources&Availability"
     standardStylesheets="false">
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />    
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
 
     <head>
         <meta charset="UTF-8"/>
@@ -13,7 +13,7 @@
     </head>
 
     <style type="text/css">
-                
+
         .same-row {
             display: -webkit-box;
             display: -webkit-flex;
@@ -73,7 +73,7 @@
 
         .yellow:hover {
             background-color: #E4C707;
-        }      
+        }
 
         .lightblue {
             background-color: lightblue;
@@ -113,10 +113,10 @@
             border-bottom: 1px solid black;
             margin-bottom: 20px;
         }
-             
+
     </style>
 
-    <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">        
+    <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">
         <div ng-show="!readyToShow">
             Loading data... Please wait...
         </div>
@@ -224,12 +224,12 @@
                                         <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
                                         <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
-                                   
                                     <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end">
                                        <td colspan="11">
-                                            <table class="AddInfoTable" id="addInfo" >
-                                                <td>
-                                                    <p class="AddInfoTitle">Contact Infornation</p>                                                   
+                                            <table class="AddInfoTable" id="addInfo">
+                                                <tr>
+                                                    <td>
+                                                        <p class="AddInfoTitle">Contact Infornation</p>
                                                         <table class="addInfoBody">
                                                             <tr>
                                                                 <td>Email</td>
@@ -264,19 +264,19 @@
                                                                 <td>??/??/????</td>
                                                             </tr>
                                                         </table>
-                                                    
-                                                </td>
-                                                <td>
-                                                    <p class="AddInfoTitle">Project Historical Data</p>
-                                                </td>
-                                                <td>
-                                                    <p class="AddInfoTitle">Skills and Certificates</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="AddInfoTitle">Project Historical Data</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="AddInfoTitle">Skills and Certificates</p>
                                                         <p> Salesforce developer </p>
                                                         <p> Salesforce administrator </p>
                                                         <p> Angular certificate </p>
-                                                </td>
+                                                    </td>
+                                                </tr>
                                             </table>
-                                       </td> 
+                                       </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -398,9 +398,9 @@
             $scope.allData = {
                 'ContactsWrap': []
             };
-			
-			$scope.isAddInfoVisible = false;
-			
+
+            $scope.isAddInfoVisible = false;
+
             $scope.paginator = {
                 currentPage: 0,
                 developersPerPage: 5,
