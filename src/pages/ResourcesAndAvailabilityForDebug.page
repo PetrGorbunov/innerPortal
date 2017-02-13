@@ -1,14 +1,11 @@
 <apex:page controller="ResourcesAndAvailabilityController"
     showHeader="true"
     sidebar="false"
-    title="Resources&Availability"
+    title="Resources&amp;Availability"
     standardStylesheets="false">
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-    <link rel="stylesheet" media="print" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />    
 
     <head>
         <meta charset="UTF-8"/>
@@ -16,6 +13,23 @@
     </head>
 
     <style type="text/css">
+                
+        .same-row {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .same-row > [class*='col-'] {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .addInfoBody {
+            border: 1px solid lightgrey;
+        }
+
         .form-control {
             width:auto;
             display:inline-block;
@@ -25,9 +39,15 @@
         }
         .container {
             width: auto;
-            margin: 5px;
+            height: 100%;
+            margin: 5px 5px 0px 5px;
             padding: 5px;
             border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .left-column .container {
+            margin-right: 0px;
         }
 
         .paddingBottom {
@@ -41,31 +61,63 @@
         }
 
         .hotpink {
+            background-color: #F69393;
+        }
+
+        .hotpink:hover {
             background-color: hotpink;
         }
         .yellow {
-            background-color: yellow;
+            background-color: #EFDC5D;
         }
+
+        .yellow:hover {
+            background-color: #E4C707;
+        }      
+
         .lightblue {
             background-color: lightblue;
         }
         .lightgreen {
-            background-color: lightgreen;
+            background-color: #8FF78D;
         }
 
+
+        .lightgreen:hover {
+            background-color: #4AFA47;
+        }
         .blue {
-            background: blue;
+            background: #8D9BF7;
             color: white;
         }
 
         .weight {
             font-weight: bold;
         }
+
+        .AddInfoTable {
+            border-top: 0px solid;
+            width: 100%;
+        }
+
+        .AddInfoTable td {
+            vertical-align: top; 
+        }
+
+        .AddInfoTitle {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .titleFilter {
+            border-bottom: 1px solid black;
+            margin-bottom: 20px;
+        }
+             
     </style>
 
-    <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">
-
-        <div ng-show="!readyToShow">
+    <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">        
+        <div ng-show="!readyToShow">             
             Loading data... Please wait...
         </div>
 
@@ -76,7 +128,7 @@
                 <!-- Header with logo -->
                 <div id="divHeader" class="col-md-12">
                     <div class="container lightblue">
-                        <!-- <img src="img/vrp.png" height="10%" width="10%"> -->
+                        <apex:image id="VRPLogo" url="{!URLFOR($Resource.vrprce__Logos, '/VRP.png')}" height="10%" width="10%" />
                         VRP Thinking globally, delivering locally
                     </div>
                 </div>
@@ -97,37 +149,47 @@
                 <!-- Searching panel -->
                 <div class="col-md-12">
                     <div class="container blue">
-                        <div id="divSearching" class="form-group">
-                            <label for="slcProjects">Projects</label>
-                            <select id="slcProjects" class="form-control">
-                                <option ng-repeat="project in allData.Projects">{{project.Name}}</option>
-                            </select>
+                        <div id="divSearching" class="form-group row">
+                            <div class="col-md-5 text-center">
+                                <label for="slcProjects">Projects</label>
+                                <select id="slcProjects" class="form-control">
+                                    <option ng-repeat="project in allData.Projects">{{project.Name}}</option>
+                                </select>
 
-                            <label class="checkbox-inline" >
-                                <input type="checkbox" id="chbProjectHistory"/>
-                                Include historical data
-                            </label>
+                                <label class="checkbox-inline" >
+                                    <input type="checkbox" id="chbProjectHistory"/>
+                                    Include historical data
+                                </label>
+                            </div>
 
-                            <label for="slcClients">Client</label>
-                            <select id="slcClients" class="form-control">
-                                <option ng-repeat="client in allData.Clients">{{client.Account__r.Name}}</option>
-                            </select>
+                            <div class="col-md-5 text-center">
+                                <label for="slcClients">Client</label>
+                                <select id="slcClients" class="form-control">
+                                    <option ng-repeat="client in allData.Clients">{{client.Account__r.Name}}</option>
+                                </select>
 
-                            <label class="checkbox-inline" >
-                                <input type="checkbox" id="chbClientHistory"/>
-                                Include historical data
-                            </label>
+                                <label class="checkbox-inline" >
+                                    <input type="checkbox" id="chbClientHistory"/>
+                                    Include historical data
+                                </label>
 
-                            <button id="btnSearch" class="btn btn-default ">
-                                Search
-                            </button>
+                                <button id="btnSearch" class="btn btn-default ">
+                                    Search
+                                </button>
+                            </div>
+
+                            <div class="col-md-2 text-center">
+                                <button id="btnMapView" class="btn btn-default ">
+                                    Map View
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Main table block -->
-            <div class="row">
+            <div class="row same-row">
                 <div   class="col-md-10 left-column ">
                     <div class="container">
 
@@ -147,7 +209,7 @@
                                     <th>Account</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="developer in allData.ContactsWrap | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
+                                    <tr ng-repeat-start="developer in allData.ContactsWrap | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
                                         <td>{{developer.contact.Name}}</td>
                                         <td>{{developer.contact.Job_Title__c}}</td>
                                         <td>{{developer.contact.Experience_Level__c}}</td>
@@ -162,6 +224,60 @@
                                         <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
                                         <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
+                                   
+                                    <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end">
+                                       <td colspan="11">
+                                            <table class="AddInfoTable" id="addInfo" >
+                                                <td>
+                                                    <p class="AddInfoTitle">Contact Infornation</p>                                                   
+                                                        <table class="addInfoBody">
+                                                            <tr>
+                                                                <td>Email</td>
+                                                                <td>{{developer.contact.Email}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Phone</td>
+                                                                <td>{{developer.contact.Phone}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Skype</td>
+                                                                <td>{{developer.contact.Skype__c}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Google Talk</td>
+                                                                <td>{{developer.contact.Google_Talk__c}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Hired Date</td>
+                                                                <td>{{developer.contact.Hired_Date__c | date:"MM/dd/yyyy"}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Emergensy phone</td>
+                                                                <td>{{developer.contact.Emergency_Phone__c}}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Vacation Last</td>
+                                                                <td>??/??/????</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Vacation Next</td>
+                                                                <td>??/??/????</td>
+                                                            </tr>
+                                                        </table>
+                                                    
+                                                </td>
+                                                <td>
+                                                    <p class="AddInfoTitle">Project Historical Data</p>
+                                                </td>
+                                                <td>
+                                                    <p class="AddInfoTitle">Skills and Certificates</p>
+                                                        <p> Salesforce developer </p>
+                                                        <p> Salesforce administrator </p>
+                                                        <p> Angular certificate </p>
+                                                </td>
+                                            </table>
+                                       </td> 
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -172,18 +288,26 @@
                             </div>
                             <div class="col-md-4 my-col text-center">
                                 <div>
-                                    <button class="btn btn-primary btn-sm" ng-disabled="!paginator.hasPrevious()" ng-click="paginator.pageBack()">
+                                    <button class="btn btn-secondary " ng-disabled="!paginator.hasPrevious()" ng-click="paginator.pageBack()">
                                         &lt; Previous
-                                    </button>
+                                    </button>                                    
                                     <span>
                                         {{paginator.showPageInfo()}}
                                     </span>
-                                    <button class="btn btn-primary btn-sm" ng-disabled="!paginator.hasNext()" ng-click="paginator.pageForward()">
+                                    <button class="btn btn-secondary " ng-disabled="!paginator.hasNext()" ng-click="paginator.pageForward()">
                                         Next &gt;
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-md-4 my-col text-center">
+                            <div class="col-md-4 my-col text-right">
+                                <label for="slcPages" >Page</label>
+                                <select id="slcPages" class="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                </select>
+                                <label> of 4 </label>
                             </div>
                         </div>
 
@@ -193,7 +317,7 @@
                 <!-- Filter panel -->
                 <div   class="col-md-2 right-column " >
                     <div class="container row" >
-                        <div id="divRightBunner" class="page-header">
+                        <div id="divRightBunner" class="titleFilter">
                             <h4>Filter Results</h4>
                         </div>
                         <div>
@@ -222,6 +346,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -274,33 +399,35 @@
             $scope.allData = {
                 'ContactsWrap': []
             };
-
+			
+			$scope.isAddInfoVisible = false;
+			
             $scope.paginator = {
                 currentPage: 0,
                 developersPerPage: 5,
                 developersCount: 0,
+                numberOfPages: function() {
+                    return Math.ceil($scope.allData.ContactsWrap.length / this.developersPerPage);
+                },
+                hasPrevious: function() {
+                    return this.currentPage > 0;
+                },
+                hasNext: function() {
+                    return this.currentPage < this.numberOfPages() - 1;
+                },
+                pageBack: function() {
+                    this.currentPage = this.currentPage - 1;
+                },
+                pageForward: function() {
+                    this.currentPage = this.currentPage + 1;
+                },
+                showPageInfo: function() {
+                    let fromRecord = this.currentPage * this.developersPerPage + 1;
+                    let lastRecordOnPage = (this.currentPage + 1) * this.developersPerPage;
+                    let toRecord = (lastRecordOnPage > this.developersCount) ? this.developersCount : lastRecordOnPage;
+                    return fromRecord + ' - ' + toRecord + ' of ' + this.developersCount;
+                }
             };
-            $scope.paginator.numberOfPages = function(){
-                return Math.ceil($scope.allData.ContactsWrap.length / $scope.paginator.developersPerPage);
-            }
-            $scope.paginator.hasPrevious = function() {
-                return $scope.paginator.currentPage > 0;
-            }
-            $scope.paginator.hasNext = function() {
-                return $scope.paginator.currentPage < $scope.paginator.numberOfPages() - 1;
-            }
-            $scope.paginator.pageBack = function() {
-                $scope.paginator.currentPage = $scope.paginator.currentPage - 1;
-            }
-            $scope.paginator.pageForward = function() {
-                $scope.paginator.currentPage = $scope.paginator.currentPage + 1;
-            }
-            $scope.paginator.showPageInfo = function() {
-                let fromRecord = $scope.paginator.currentPage * $scope.paginator.developersPerPage + 1;
-                let lastRecordOnPage = ($scope.paginator.currentPage + 1) * $scope.paginator.developersPerPage;
-                let toRecord = (lastRecordOnPage > $scope.paginator.developersCount) ? $scope.paginator.developersCount : lastRecordOnPage;
-                return fromRecord + ' - ' + toRecord + ' of ' + $scope.paginator.developersCount;
-            }
 
             $scope.queryUpdate = function () {
                 var def = getData( {keyword: ''} );
