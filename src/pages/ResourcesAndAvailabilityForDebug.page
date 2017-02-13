@@ -1,11 +1,11 @@
 <apex:page controller="ResourcesAndAvailabilityController"
     showHeader="true"
     sidebar="false"
-    title="Resources&amp;Availability"
+    title="Resources And Availability"
     standardStylesheets="false">
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />    
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
 
     <head>
         <meta charset="UTF-8"/>
@@ -13,7 +13,7 @@
     </head>
 
     <style type="text/css">
-                
+
         .same-row {
             display: -webkit-box;
             display: -webkit-flex;
@@ -52,7 +52,7 @@
 
         .paddingBottom {
             padding-bottom: 20px;
-        }     
+        }
         .left-column {
             padding-right: 0px;
         }
@@ -73,7 +73,7 @@
 
         .yellow:hover {
             background-color: #E4C707;
-        }      
+        }
 
         .lightblue {
             background-color: lightblue;
@@ -101,7 +101,7 @@
         }
 
         .AddInfoTable td {
-            vertical-align: top; 
+            vertical-align: top;
         }
 
         .AddInfoTitle {
@@ -113,11 +113,26 @@
             border-bottom: 1px solid black;
             margin-bottom: 20px;
         }
-             
+
+        .withoutMarge {
+            margin: 0px;
+        }
+
+        .borderBottom {
+            border-bottom: 1px dotted black;
+            margin: 10px;
+            padding-bottom: 10px;
+        }
+
+        .scroll {
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
     </style>
 
-    <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">        
-        <div ng-show="!readyToShow">             
+    <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">
+        <div ng-show="!readyToShow">
             Loading data... Please wait...
         </div>
 
@@ -224,59 +239,76 @@
                                         <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
                                         <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
-                                   
+
                                     <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end">
                                        <td colspan="11">
-                                            <table class="AddInfoTable" id="addInfo" >
-                                                <td>
-                                                    <p class="AddInfoTitle">Contact Infornation</p>                                                   
-                                                        <table class="addInfoBody">
-                                                            <tr>
-                                                                <td>Email</td>
-                                                                <td>{{developer.contact.Email}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Phone</td>
-                                                                <td>{{developer.contact.Phone}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Skype</td>
-                                                                <td>{{developer.contact.Skype__c}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Google Talk</td>
-                                                                <td>{{developer.contact.Google_Talk__c}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Hired Date</td>
-                                                                <td>{{developer.contact.Hired_Date__c | date:"MM/dd/yyyy"}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Emergensy phone</td>
-                                                                <td>{{developer.contact.Emergency_Phone__c}}</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Vacation Last</td>
-                                                                <td>??/??/????</td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>Vacation Next</td>
-                                                                <td>??/??/????</td>
-                                                            </tr>
-                                                        </table>
-                                                    
-                                                </td>
-                                                <td>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <p class="AddInfoTitle">Contact Infornation</p>
+                                                    <div class="addInfoBody">
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Email</div>
+                                                            <div class="value col-md-8">{{developer.contact.Email}}</div>
+                                                        </div>
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Phone</div>
+                                                            <div class="value col-md-8">{{developer.contact.Phone}}</div>
+                                                        </div>
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Skype</div>
+                                                            <div class="value col-md-8">{{developer.contact.Skype__c}}</div>
+                                                        </div>
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Google Talk</div>
+                                                            <div class="value col-md-8">{{developer.contact.Google_Talk__c}}</div>
+                                                        </div>
+
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Hired Date</div>
+                                                            <div class="value col-md-8">{{developer.contact.Hired_Date__c | date:"MM/dd/yyyy"}}</div>
+                                                        </div>
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Emergensy phone</div>
+                                                            <div class="value col-md-8">{{developer.contact.Emergency_Phone__c}}</div>
+                                                        </div>
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Vacation Last</div>
+                                                            <div class="value col-md-8">{{developer.lastVacation}}</div>
+                                                        </div>
+                                                        <div class="withoutMarge row">
+                                                            <div class="key col-md-4">Vacation Next</div>
+                                                            <div class="value col-md-8">{{developer.nextVacation}}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4 ">
                                                     <p class="AddInfoTitle">Project Historical Data</p>
-                                                </td>
-                                                <td>
+                                                    <div class="addInfoBody scroll" >
+                                                        <div class="row borderBottom" ng-repeat="project in developer.contact.Resource_Projects__r">
+                                                            <div class="withoutMarge col-md-6 text-left" >
+                                                                {{project.Project__r.Name}}
+                                                            </div>
+                                                            <div class="withoutMarge col-md-6 text-right" >
+                                                                {{project.Start_Date__c | date:"MMMM yyyy"}}
+                                                                -
+                                                                {{project.End_Date__c | date:"MMMM yyyy"}}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
                                                     <p class="AddInfoTitle">Skills and Certificates</p>
-                                                        <p> Salesforce developer </p>
-                                                        <p> Salesforce administrator </p>
-                                                        <p> Angular certificate </p>
-                                                </td>
-                                            </table>
-                                       </td> 
+                                                    <div class="addInfoBody">
+                                                        <p class="withoutMarge" ng-repeat="skill in developer.contact.Employees__r.Skill__r.Name">
+                                                            {{skill}}
+                                                        </p>
+                                                        <p class="withoutMarge" ng-repeat="certificate in developer.contact.Employees_Certifications__r.Certificate__r.Name">
+                                                            {{certificate}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                       </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -284,13 +316,19 @@
 
                         <!-- Paginator -->
                         <div id="PaginationBlock" class="row ">
-                            <div class="col-md-4 my-col text-center">
+                            <div class="col-md-4 my-col text-left">
+                                <label for="slcRecordsOnPage" >Records on page</label>
+                                <select   ng-model="paginator.developersPerPage"
+                                          ng-options="records as records for records in paginator.POSSIBLE_DEVELOPERS_PER_PAGE"
+                                          id="slcRecordsOnPage"
+                                          class="form-control">
+                                </select>
                             </div>
                             <div class="col-md-4 my-col text-center">
                                 <div>
                                     <button class="btn btn-secondary " ng-disabled="!paginator.hasPrevious()" ng-click="paginator.pageBack()">
                                         &lt; Previous
-                                    </button>                                    
+                                    </button>
                                     <span>
                                         {{paginator.showPageInfo()}}
                                     </span>
@@ -301,13 +339,12 @@
                             </div>
                             <div class="col-md-4 my-col text-right">
                                 <label for="slcPages" >Page</label>
-                                <select id="slcPages" class="form-control">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
+                                <select   ng-model="paginator.currentPage"
+                                          ng-options="page as page+1 for page in paginator.pages()"
+                                          id="slcPages"
+                                          class="form-control">
                                 </select>
-                                <label> of 4 </label>
+                                <label> of {{paginator.numberOfPages()}} </label>
                             </div>
                         </div>
 
@@ -399,13 +436,15 @@
             $scope.allData = {
                 'ContactsWrap': []
             };
-			
+
 			$scope.isAddInfoVisible = false;
-			
+
             $scope.paginator = {
                 currentPage: 0,
-                developersPerPage: 5,
+                POSSIBLE_DEVELOPERS_PER_PAGE: [10, 20, 50, 100],
+                developersPerPage: 10,
                 developersCount: 0,
+
                 numberOfPages: function() {
                     return Math.ceil($scope.allData.ContactsWrap.length / this.developersPerPage);
                 },
@@ -426,7 +465,14 @@
                     let lastRecordOnPage = (this.currentPage + 1) * this.developersPerPage;
                     let toRecord = (lastRecordOnPage > this.developersCount) ? this.developersCount : lastRecordOnPage;
                     return fromRecord + ' - ' + toRecord + ' of ' + this.developersCount;
-                }
+                },
+                pages: function() {
+                    let arr = [];
+                    for (var i = 0; i < this.numberOfPages(); i++) {
+                        arr.push(i);
+                    }
+                    return arr;
+                },
             };
 
             $scope.queryUpdate = function () {
