@@ -171,7 +171,7 @@
                                 </select>
 
                                 <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbProjectHistory"/>
+                                    <input type="checkbox" id="chbProjectHistory" ng-model="filters.projectHistory"/>
                                     Include historical data
                                 </label>
                             </div>
@@ -182,7 +182,7 @@
                                 </select>
 
                                 <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbClientHistory"/>
+                                    <input type="checkbox" id="chbClientHistory" ng-model="filters.clientHistory"/>
                                     Include historical data
                                 </label>
 
@@ -222,7 +222,7 @@
                                     <th>Account</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject | clients:filters.selectedClient | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.columns:false | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
+                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.columns:false | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
                                         <td>{{developer.contact.Name}}</td>
                                         <td>{{developer.contact.Job_Title__c}}</td>
                                         <td>{{developer.contact.Experience_Level__c}}</td>
@@ -407,23 +407,43 @@
         });
 
         ResAndAvailApp.filter('projects', function() {
-            return function(input, condition) {
-                if (!condition || !condition.hasOwnProperty('Id')) {
+            return function(input, project, history) {
+                if (!project || !project.hasOwnProperty('Id')) {
                     return input;
                 }
                 return input.filter(function(value) {
-                    return (value.hasOwnProperty('currentProject') && value.currentProject.Project__c == condition.Id);
+                    if (!history) {
+                        return (value.hasOwnProperty('currentProject') && value.currentProject.Project__c == project.Id);
+                    }
+                    if (!value.contact.Resource_Projects__r) {
+                        return false;
+                    }
+                    var result = false;
+                    value.contact.Resource_Projects__r.forEach(function(value) {
+                        result = (value.Project__c == project.Id) || result;
+                    });
+                    return result;
                 });
             };
         });
 
         ResAndAvailApp.filter('clients', function() {
-            return function(input, condition) {
-                if (!condition || !condition.hasOwnProperty('Id')) {
+            return function(input, client, history) {
+                if (!client || !client.hasOwnProperty('Id')) {
                     return input;
                 }
                 return input.filter(function(value) {
-                    return (value.hasOwnProperty('currentProject') && value.currentProject.Project__r.Customer__c == condition.Id);
+                    if (!history) {
+                        return (value.hasOwnProperty('currentProject') && value.currentProject.Project__r.Customer__c == client.Id);
+                    }
+                    if (!value.contact.Resource_Projects__r) {
+                        return false;
+                    }
+                    var result = false;
+                    value.contact.Resource_Projects__r.forEach(function(value) {
+                        result = (value.Project__r.Customer__c == client.Id) || result;
+                    });
+                    return result;
                 });
             };
         });
@@ -520,7 +540,9 @@
 
             $scope.filters = {
                 selectedProject: null,
+                projectHistory: false,
                 selectedClient: null,
+                clientHistory: false,
                 accounts: [],
                 departments: [],
                 immediateAvailable: false
