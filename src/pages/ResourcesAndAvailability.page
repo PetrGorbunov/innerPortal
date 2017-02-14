@@ -167,8 +167,7 @@
                         <div id="divSearching" class="form-group row">
                             <div class="col-md-5 text-center">
                                 <label for="slcProjects">Projects</label>
-                                <select id="slcProjects" class="form-control">
-                                    <option ng-repeat="project in allDataFromServer.Projects">{{project.Name}}</option>
+                                <select id="slcProjects" class="form-control" ng-options="project.Name for project in allDataFromServer.Projects" ng-model="filters.selectedProject">
                                 </select>
 
                                 <label class="checkbox-inline" >
@@ -179,8 +178,7 @@
 
                             <div class="col-md-5 text-center">
                                 <label for="slcClients">Client</label>
-                                <select id="slcClients" class="form-control">
-                                    <option ng-repeat="client in allDataFromServer.Clients">{{client.Account__r.Name}}</option>
+                                <select id="slcClients" class="form-control" ng-options="client.Account__r.Name for client in allDataFromServer.Clients" ng-model="filters.selectedClient">
                                 </select>
 
                                 <label class="checkbox-inline" >
@@ -224,7 +222,7 @@
                                     <th>Account</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat-start="developer in tableData | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
+                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject | clients:filters.selectedClient | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.columns:false | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
                                         <td>{{developer.contact.Name}}</td>
                                         <td>{{developer.contact.Job_Title__c}}</td>
                                         <td>{{developer.contact.Experience_Level__c}}</td>
@@ -339,7 +337,7 @@
                             <div class="col-md-4 my-col text-right">
                                 <label for="slcPages" >Page</label>
                                 <select   ng-model="paginator.currentPage"
-                                          ng-options="page as page+1 for page in paginator.pages()"
+                                          ng-options="page + 1 for page in paginator.pages()"
                                           id="slcPages"
                                           class="form-control">
                                 </select>
@@ -359,24 +357,24 @@
                         <div>
                             <div class="paddingBottom">
                                 <p class="weight">Account</p>
-                                <div ng-repeat="account in allDataFromServer.Accounts">
-                                    <label class="checkbox-inline"  >
-                                        <input type="checkbox" /> {{account}}
+                                <div ng-repeat="account in filters.accounts">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" ng-model="account['Checked']"/> {{account.Name}}
                                     </label>
                                 </div>
                             </div>
                             <div class="paddingBottom">
                                 <p class="weight">Department</p>
-                                <div ng-repeat="department in allDataFromServer.Departments" >
+                                <div ng-repeat="department in filters.departments" >
                                     <label class="checkbox-inline" >
-                                        <input type="checkbox" /> {{department}}
+                                        <input type="checkbox" ng-model="department['Checked']"/> {{department.Name}}
                                     </label>
                                 </div>
                             </div>
                             <div class="paddingBottom">
                                 <p class="weight">Immediately available</p>
                                 <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbAvailable" /> Yes
+                                    <input type="checkbox" id="chbAvailable" ng-model="filters.immediateAvailable"/> Yes
                                 </label>
                             </div>
                         </div>
@@ -394,6 +392,96 @@
         ResAndAvailApp.filter('startFrom', function() {
             return function(input, start) {
                 return input.slice(start);
+            };
+        });
+
+        ResAndAvailApp.filter('paginator', function() {
+            return function(input, paginator) {
+                if (paginator.developersCount != input.length) {
+                    paginator.developersCount = input.length;
+                    paginator.currentPage = 0;
+                }
+                var startPosition = paginator.currentPage * paginator.developersPerPage;
+                return input.slice(startPosition, startPosition + paginator.developersPerPage);
+            };
+        });
+
+        ResAndAvailApp.filter('projects', function() {
+            return function(input, condition) {
+                if (!condition || !condition.hasOwnProperty('Id')) {
+                    return input;
+                }
+                return input.filter(function(value) {
+                    return (value.hasOwnProperty('currentProject') && value.currentProject.Project__c == condition.Id);
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('clients', function() {
+            return function(input, condition) {
+                if (!condition || !condition.hasOwnProperty('Id')) {
+                    return input;
+                }
+                return input.filter(function(value) {
+                    return (value.hasOwnProperty('currentProject') && value.currentProject.Project__r.Customer__c == condition.Id);
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('accounts', function() {
+            var someChecked = function(value) {
+                return value.Checked;
+            }
+            var everyChecked = function(value) {
+                return value.Checked;
+            }
+            return function(input, accounts) {
+                if (!accounts.some(someChecked) || accounts.every(everyChecked)) {
+                    return input;
+                }
+                var selectedAccounts = {};
+                accounts.forEach(function(value) {
+                    if (value.Checked) {
+                        selectedAccounts[value.Name] = true;
+                    }
+                });
+                return input.filter(function(value) {
+                    return selectedAccounts.hasOwnProperty(value.contact.Account.Name);
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('departments', function() {
+            var someChecked = function(value) {
+                return value.Checked;
+            }
+            var everyChecked = function(value) {
+                return value.Checked;
+            }
+            return function(input, departments) {
+                if (!departments.some(someChecked) || departments.every(everyChecked)) {
+                    return input;
+                }
+                var selectedDepartments = {};
+                departments.forEach(function(value) {
+                    if (value.Checked) {
+                        selectedDepartments[value.Name] = true;
+                    }
+                });
+                return input.filter(function(value) {
+                    return selectedDepartments.hasOwnProperty(value.contact.Job_Title__c);
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('available', function() {
+            return function(input, available) {
+                if (!available) {
+                    return input;
+                }
+                return input.filter(function(value) {
+                    return value.availabilityHours > 0;
+                });
             };
         });
 
@@ -430,10 +518,20 @@
 
             $scope.bookmarkedPeople = [];
 
+            $scope.filters = {
+                selectedProject: null,
+                selectedClient: null,
+                accounts: [],
+                departments: [],
+                immediateAvailable: false
+            };
+
+            $scope.sort = {
+                columns: ['+contact.Job_Title__c', '+contact.Name']
+            };
+
             $scope.allDataFromServer = {};
             $scope.tableData = [];
-
-            $scope.isAddInfoVisible = false;
 
             $scope.paginator = {
                 POSSIBLE_DEVELOPERS_PER_PAGE: [5, 10, 20, 50, 100],
@@ -441,7 +539,7 @@
                 developersPerPage: 5,
                 developersCount: 0,
                 numberOfPages: function() {
-                    return Math.ceil($scope.tableData.length / this.developersPerPage);
+                    return Math.ceil(this.developersCount / this.developersPerPage);
                 },
                 hasPrevious: function() {
                     return this.currentPage > 0;
@@ -456,7 +554,7 @@
                     this.currentPage = this.currentPage + 1;
                 },
                 showPageInfo: function() {
-                    let fromRecord = this.currentPage * this.developersPerPage + 1;
+                    let fromRecord = (this.developersCount > 0) ? this.currentPage * this.developersPerPage + 1 : 0;
                     let lastRecordOnPage = (this.currentPage + 1) * this.developersPerPage;
                     let toRecord = (lastRecordOnPage > this.developersCount) ? this.developersCount : lastRecordOnPage;
                     return fromRecord + ' - ' + toRecord + ' of ' + this.developersCount;
@@ -472,7 +570,8 @@
 
             $scope.readingDataForTable = function() {
                 $scope.tableData = $scope.allDataFromServer.ContactsWrap;
-                $scope.paginator.developersCount = $scope.tableData.length;
+                // $scope.paginator.developersCount = $scope.tableData.length;
+                // console.dir($scope.tableData);
             }
 
             $scope.updateDataFromServer = function() {
@@ -482,6 +581,20 @@
                     def.then(
                         function(result) {
                             $scope.allDataFromServer = result;
+                            $scope.filters.selectedProject = $scope.allDataFromServer.Projects[0];
+                            $scope.filters.selectedClient = $scope.allDataFromServer.Clients[0];
+                            $scope.filters.accounts = $scope.allDataFromServer.Accounts.map(function(value) {
+                                return {
+                                    Name: value,
+                                    Checked: false
+                                }
+                            });
+                            $scope.filters.departments = $scope.allDataFromServer.Departments.map(function(value) {
+                                return {
+                                    Name: value,
+                                    Checked: false
+                                }
+                            });
                             if ($scope.queryQueue == true) {
                                 $scope.updateDataFromServer();
                             }
