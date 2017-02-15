@@ -28,6 +28,13 @@
 
         .addInfoBody {
             border: 1px solid lightgrey;
+            margin: 0px 0px 5px  0px;
+        }
+
+        .addInfoBookmark {
+            border: 1px solid lightgrey;
+            padding: 5px 0px;
+            margin: 0px;
         }
 
         .form-control {
@@ -91,6 +98,18 @@
             color: white;
         }
 
+        .concaveRed {
+            background: linear-gradient(to bottom, #F69393, #FEFCEA);
+        }
+
+        .concaveGreen {
+            background: linear-gradient(to bottom, #8FF78D, #FEFCEA);
+        }
+
+        .concaveYellow {
+            background: linear-gradient(to bottom, #EFDC5D, #FEFCEA);
+        }
+
         .weight {
             font-weight: bold;
         }
@@ -118,6 +137,10 @@
             margin: 0px;
         }
 
+        .withoutPadding {
+            padding: 0px;
+        }
+
         .borderBottom {
             border-bottom: 1px dotted black;
             margin: 10px;
@@ -128,6 +151,22 @@
             overflow-y: scroll;
             overflow-x: hidden;
         }
+
+        .addInfoBlock {
+            -webkit-transform: translateX(0);
+            transform: translateX(0);
+            -webkit-transition: all 2s ease-in-out;
+            transition: all 2s ease-in-out;
+        }
+
+        .addInfoBlock.hide {
+            visibility: hidden;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            -webkit-transform: translateX(100%);
+            transform: translateX(100%);
+        }
+
 
     </style>
 
@@ -164,38 +203,32 @@
                 <!-- Searching panel -->
                 <div class="col-md-12">
                     <div class="container blue">
-                        <div id="divSearching" class="form-group row">
-                            <div class="col-md-5 text-center">
-                                <label for="slcProjects">Projects</label>
-                                <select id="slcProjects" class="form-control" ng-options="project.Name for project in allDataFromServer.Projects" ng-model="filters.selectedProject">
-                                </select>
+                        <div class="col-md-5 text-center">
+                            <label for="slcProjects">Projects</label>
+                            <select id="slcProjects" class="form-control" ng-options="project.Name for project in allDataFromServer.Projects" ng-model="filters.selectedProject">
+                            </select>
 
-                                <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbProjectHistory" ng-model="filters.projectHistory"/>
-                                    Include historical data
-                                </label>
-                            </div>
+                            <label class="checkbox-inline" >
+                                <input type="checkbox" id="chbProjectHistory" ng-model="filters.projectHistory"/>
+                                Include historical data
+                            </label>
+                        </div>
 
-                            <div class="col-md-5 text-center">
-                                <label for="slcClients">Client</label>
-                                <select id="slcClients" class="form-control" ng-options="client.Account__r.Name for client in allDataFromServer.Clients" ng-model="filters.selectedClient">
-                                </select>
+                        <div class="col-md-5 text-center">
+                            <label for="slcClients">Client</label>
+                            <select id="slcClients" class="form-control" ng-options="client.Account__r.Name for client in allDataFromServer.Clients" ng-model="filters.selectedClient">
+                            </select>
 
-                                <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbClientHistory" ng-model="filters.clientHistory"/>
-                                    Include historical data
-                                </label>
+                            <label class="checkbox-inline" >
+                                <input type="checkbox" id="chbClientHistory" ng-model="filters.clientHistory"/>
+                                Include historical data
+                            </label>
+                        </div>
 
-                                <button id="btnSearch" class="btn btn-default ">
-                                    Search
-                                </button>
-                            </div>
-
-                            <div class="col-md-2 text-center">
-                                <button id="btnMapView" class="btn btn-default ">
-                                    Map View
-                                </button>
-                            </div>
+                        <div class="col-md-2 text-center vcenter">
+                            <button id="btnMapView" class="" ng-click="changeMapView()">
+                                {{isMapChanged ? "Table View" : "Map View"}}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -203,11 +236,11 @@
 
             <!-- Main table block -->
             <div class="row same-row">
-                <div   class="col-md-10 left-column ">
+                <div class="col-md-10 left-column ">
                     <div class="container">
 
-                        <div id="divMainTable">
-                            <table class="table">
+                        <div id="divMainTable" >
+                            <table class="table"  ng-if="!isMapChanged" >
                                 <thead>
                                     <th>Full Name</th>
                                     <th>Department</th>
@@ -228,7 +261,7 @@
                                         <td>{{developer.contact.Experience_Level__c}}</td>
                                         <td>{{developer.contact.English_Level__c}}</td>
                                         <td>
-                                            <p ng-show="developer.contact.Employee_Private_Documents__r">true</p>
+                                            <span ng-show="developer.contact.Employee_Private_Documents__r"> <apex:image value="/img/permissions_confirm16.gif" /></span>
                                         </td>
                                         <td>{{developer.availabilityHours}} {{developer.availabilityAddInfo}}</td>
                                         <td>{{developer.currentProject.Project__r.Name}}</td>
@@ -237,8 +270,8 @@
                                         <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
                                         <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
-                                    <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end">
-                                       <td colspan="11">
+                                    <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end" class="addInfoBlock">
+                                       <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.Immediate <= 4 ? 'concaveYellow' : 'concaveGreen')" >
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <p class="AddInfoTitle">Contact Infornation</p>
@@ -295,7 +328,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <p class="AddInfoTitle">Skills and Certificates</p>
-                                                    <div class="addInfoBody">
+                                                    <div class="addInfoBody scroll">
                                                         <p class="withoutMarge" ng-repeat="skill in developer.contact.Employees__r.Skill__r.Name">
                                                             {{skill}}
                                                         </p>
@@ -305,7 +338,71 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div class="row addInfoBookmark">
+                                                <div class="col-md-4 withoutMarge text-center" >
+                                                    <label for="slcProjectsForAllocation">Select Project for Allocation:</label>
+                                                    <select id="slcProjectsForAllocation" class="form-control">
+                                                        <option ng-repeat="project in allDataFromServer.Projects">{{project.Name}}</option>
+                                                    </select>
+                                                </div>
+
+                                                    <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                        <div class="input-group date" id="datetimepicker1" >
+                                                            <input id="inpFromDate" type="text" class="form-control" />
+                                                            <span class="input-group-addon">
+                                                                <span class="glyphicon glyphicon-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                        <div class="input-group date" id="datetimepicker2">
+                                                            <input id="inputToDate" type="text" class="form-control" />
+                                                            <span class="input-group-addon">
+                                                                <span class="glyphicon glyphicon-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-4 withoutMarge vcenter text-center" >
+                                                        <label for="slcBusyness">Busyness:</label>
+                                                        <select id="slcBusyness" class="form-control">
+                                                            <option >8 Hours</option>
+                                                            <option >4 Hours</option>
+                                                        </select>
+                                                        <button id="btnBookmarkFromAddInfo" class="btn btn-default ">
+                                                            Bookmark
+                                                        </button>
+                                                    </div>
+                                                </div>
                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <table class="table"  ng-if="isMapChanged" >
+                                <thead>
+                                    <th>Full Name</th>
+                                    <th>Jan 2017</th>
+                                    <th>Feb 2017</th>
+                                    <th>Mar 2017</th>
+                                    <th>Apr 2017</th>
+                                    <th>May 2017</th>
+                                    <th>Jun 2017</th>
+                                    <th>Jul 2017</th>
+                                    <th>Aug 2017</th>
+                                    <th>Sep 2017</th>
+                                    <th>Oct 2017</th>
+                                    <th>Nov 2017</th>
+                                    <th>Dec 2017</th>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="developer in tableData | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" >
+                                        <td>{{developer.contact.Name}}</td>
+                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
+
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -537,6 +634,12 @@
         ResAndAvailApp.controller('ResAndAvailCtrl', ['$scope', '$filter' ,'getData', function($scope, $filter, getData) {
 
             $scope.bookmarkedPeople = [];
+
+            $scope.isMapChanged = false;
+
+            $scope.changeMapView = function() {
+                $scope.isMapChanged = !$scope.isMapChanged;
+            }
 
             $scope.filters = {
                 selectedProject: null,
