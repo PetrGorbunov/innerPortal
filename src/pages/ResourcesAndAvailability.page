@@ -234,42 +234,55 @@
                 </div>
             </div>
 
-            <!-- Main table block -->
+            <!-- Main table panel -->
             <div class="row same-row">
                 <div class="col-md-10 left-column ">
                     <div class="container">
 
                         <div id="divMainTable" >
-                            <table class="table"  ng-if="!isMapChanged" >
+
+                            <!-- Table view -->
+                            <table class="table"  ng-if="!isMapChanged">
                                 <thead>
-                                    <th>Full Name</th>
-                                    <th>Department</th>
-                                    <th>Experience Level</th>
-                                    <th>English Level</th>
-                                    <th>US Visa</th>
-                                    <th>Immediate Availability (h)</th>
-                                    <th>Project Allocation</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Team Lead</th>
-                                    <th>Account</th>
+                                    <th ng-repeat="field in tableFields">
+                                      <a ng-click="sort.changeSort(field.fieldName)" ng-if="field.type != 'defaultString'">
+                                        <div>
+                                            {{field.label}}
+                                            <span ng-show="sort.sortColumn == field.fieldName && !sort.sortReverse">▲</span>
+                                            <span ng-show="sort.sortColumn == field.fieldName && sort.sortReverse">▼</span>
+                                        </div>
+                                      </a>
+                                      <a ng-click="sort.defaultReverse = !sort.defaultReverse" ng-if="field.type == 'defaultString'" style="color: gray;">
+                                        <div>
+                                            {{field.label}}
+                                            <span ng-show="sort.defaultColumn == field.fieldName && !sort.defaultReverse">▲</span>
+                                            <span ng-show="sort.defaultColumn == field.fieldName && sort.defaultReverse">▼</span>
+                                        </div>
+                                      </a>
+                                    </th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.columns:false | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
-                                        <td>{{developer.contact.Name}}</td>
-                                        <td>{{developer.contact.Job_Title__c}}</td>
-                                        <td>{{developer.contact.Experience_Level__c}}</td>
-                                        <td>{{developer.contact.English_Level__c}}</td>
-                                        <td>
-                                            <span ng-show="developer.contact.Employee_Private_Documents__r"> <apex:image value="/img/permissions_confirm16.gif" /></span>
+                                    <!-- Main rows of table -->
+                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.getColumns() | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
+                                        <td ng-repeat="field in tableFields">
+                                            <div ng-if="field.type == 'string'">
+                                                {{getValue(developer, field.fieldName)}}
+                                            </div>
+                                            <div ng-if="field.type == 'defaultString'">
+                                                {{getValue(developer, field.fieldName)}}
+                                            </div>
+                                            <div ng-if="field.type == 'boolean'">
+                                                <span ng-show="getValue(developer, field.fieldName)"><apex:image value="/img/permissions_confirm16.gif"/></span>
+                                            </div>
+                                            <div ng-if="field.type == 'addString'">
+                                                {{getValue(developer, field.fieldName)}}{{getValue(developer, field.addFieldName)}}
+                                            </div>
+                                            <div ng-if="field.type == 'date'">
+                                                {{getValue(developer, field.fieldName) | date:"MM/dd/yyyy"}}
+                                            </div>
                                         </td>
-                                        <td>{{developer.availabilityHours}} {{developer.availabilityAddInfo}}</td>
-                                        <td>{{developer.currentProject.Project__r.Name}}</td>
-                                        <td>{{developer.currentProject.Start_Date__c | date:"mm/dd/yyyy"}}</td>
-                                        <td>{{developer.currentProject.End_Date__c | date:"mm/dd/yyyy"}}</td>
-                                        <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
-                                        <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
+                                    <!-- Add information for row -->
                                     <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end" class="addInfoBlock">
                                        <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.Immediate <= 4 ? 'concaveYellow' : 'concaveGreen')" >
                                             <div class="row">
@@ -381,6 +394,7 @@
                                 </tbody>
                             </table>
 
+                            <!-- Map view -->
                             <table class="table"  ng-if="isMapChanged" >
                                 <thead>
                                     <th>Full Name</th>
@@ -398,7 +412,7 @@
                                     <th>Dec 2017</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="developer in tableData | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" >
+                                    <tr ng-repeat="developer in tableData | paginator:paginator" >
                                         <td>{{developer.contact.Name}}</td>
                                         <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
 
@@ -486,11 +500,64 @@
 
         var ResAndAvailApp = angular.module('ResAndAvail', []);
 
-        ResAndAvailApp.filter('startFrom', function() {
-            return function(input, start) {
-                return input.slice(start);
-            };
-        });
+        ResAndAvailApp.constant('tableFields', [
+            {
+                'label': 'Full Name',
+                'fieldName': 'contact.Name',
+                'type': 'string'
+            },
+            {
+                'label': 'Department',
+                'fieldName': 'contact.Job_Title__c',
+                'type': 'defaultString'
+            },
+            {
+                'label': 'Experience Level',
+                'fieldName': 'contact.Experience_Level__c',
+                'type': 'string'
+            },
+            {
+                'label': 'English Level',
+                'fieldName': 'contact.English_Level__c',
+                'type': 'string'
+            },
+            {
+                'label': 'US Visa',
+                'fieldName': 'contact.Employee_Private_Documents__r',
+                'type': 'boolean'
+            },
+            {
+                'label': 'Immediate Availability (h)',
+                'fieldName': 'availabilityHours',
+                'addFieldName': 'availabilityAddInfo',
+                'type': 'addString'
+            },
+            {
+                'label': 'Project Allocation',
+                'fieldName': 'currentProject.Project__r.Name',
+                'type': 'string'
+            },
+            {
+                'label': 'From',
+                'fieldName': 'currentProject.Start_Date__c',
+                'type': 'date'
+            },
+            {
+                'label': 'To',
+                'fieldName': 'currentProject.End_Date__c',
+                'type': 'date'
+            },
+            {
+                'label': 'Team Lead',
+                'fieldName': 'contact.Employee_User__r.Manager.Name',
+                'type': 'string'
+            },
+            {
+                'label': 'Account',
+                'fieldName': 'contact.Account.Name',
+                'type': 'string'
+            }
+        ]);
 
         ResAndAvailApp.filter('paginator', function() {
             return function(input, paginator) {
@@ -631,7 +698,15 @@
             }
         }]);
 
-        ResAndAvailApp.controller('ResAndAvailCtrl', ['$scope', '$filter' ,'getData', function($scope, $filter, getData) {
+        ResAndAvailApp.controller('ResAndAvailCtrl', ['$scope', '$filter' ,'getData', 'tableFields', function($scope, $filter, getData, tableFields) {
+            $scope.allDataFromServer = {};
+            $scope.tableData = [];
+            $scope.tableFields = tableFields;
+            $scope.getValue = function(objectIn, path) {
+                return path.split('.').reduce(function(prevValue, value) {
+                    return (prevValue != null && prevValue.hasOwnProperty(value)) ? prevValue[value] : null;
+                }, objectIn);
+            }
 
             $scope.bookmarkedPeople = [];
 
@@ -652,16 +727,29 @@
             };
 
             $scope.sort = {
-                columns: ['+contact.Job_Title__c', '+contact.Name']
+                defaultColumn: 'contact.Job_Title__c',
+                defaultReverse: false,
+                sortColumn: 'contact.Name',
+                sortReverse: false,
+                getColumns: function() {
+                    var result = [];
+                    result.push((this.defaultReverse ? '-' : '+') + this.defaultColumn);
+                    result.push((this.sortReverse ? '-' : '+') + this.sortColumn);
+                    return result;
+                },
+                changeSort: function(columnName) {
+                    if (this.sortColumn != columnName) {
+                      this.sortReverse = true;
+                    }
+                    this.sortReverse = !this.sortReverse;
+                    this.sortColumn = columnName;
+                }
             };
-
-            $scope.allDataFromServer = {};
-            $scope.tableData = [];
 
             $scope.paginator = {
                 POSSIBLE_DEVELOPERS_PER_PAGE: [5, 10, 20, 50, 100],
                 currentPage: 0,
-                developersPerPage: 5,
+                developersPerPage: 0,
                 developersCount: 0,
                 numberOfPages: function() {
                     return Math.ceil(this.developersCount / this.developersPerPage);
@@ -691,12 +779,28 @@
                     }
                     return arr;
                 },
+                initPaginator: function() {
+                    this.developersPerPage = this.POSSIBLE_DEVELOPERS_PER_PAGE[0];
+                }
             };
+            $scope.paginator.initPaginator();
 
             $scope.readingDataForTable = function() {
                 $scope.tableData = $scope.allDataFromServer.ContactsWrap;
-                // $scope.paginator.developersCount = $scope.tableData.length;
-                // console.dir($scope.tableData);
+                $scope.filters.selectedProject = $scope.allDataFromServer.Projects[0];
+                $scope.filters.selectedClient = $scope.allDataFromServer.Clients[0];
+                $scope.filters.accounts = $scope.allDataFromServer.Accounts.map(function(value) {
+                    return {
+                        Name: value,
+                        Checked: false
+                    }
+                });
+                $scope.filters.departments = $scope.allDataFromServer.Departments.map(function(value) {
+                    return {
+                        Name: value,
+                        Checked: false
+                    }
+                });
             }
 
             $scope.updateDataFromServer = function() {
@@ -706,20 +810,6 @@
                     def.then(
                         function(result) {
                             $scope.allDataFromServer = result;
-                            $scope.filters.selectedProject = $scope.allDataFromServer.Projects[0];
-                            $scope.filters.selectedClient = $scope.allDataFromServer.Clients[0];
-                            $scope.filters.accounts = $scope.allDataFromServer.Accounts.map(function(value) {
-                                return {
-                                    Name: value,
-                                    Checked: false
-                                }
-                            });
-                            $scope.filters.departments = $scope.allDataFromServer.Departments.map(function(value) {
-                                return {
-                                    Name: value,
-                                    Checked: false
-                                }
-                            });
                             if ($scope.queryQueue == true) {
                                 $scope.updateDataFromServer();
                             }
