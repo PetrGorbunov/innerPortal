@@ -225,7 +225,7 @@
                                 <label class="checkbox-inline" >
                                     <input type="checkbox" id="chbClientHistory"/>
                                     Include historical data
-                                </label>                                
+                                </label>
                             </div>
 
                             <div class="col-md-2 text-center vcenter">
@@ -365,7 +365,7 @@
                                                             <span class="input-group-addon">
                                                                 <span class="glyphicon glyphicon-calendar"></span>
                                                             </span>
-                                                        </div>                                                           
+                                                        </div>
                                                     </div>
 
                                                     <div class="col-md-4 withoutMarge vcenter text-center" >
