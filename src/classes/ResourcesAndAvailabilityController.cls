@@ -144,9 +144,9 @@ public with sharing class ResourcesAndAvailabilityController {
         }
 
         private String getAvailAddInfo(List<PHG_Employee_Availability__c> emplAvails) {
-            if (emplAvails[0].Hours__c == 0 && emplAvails.size() == 1) {
+            if (emplAvails[0].Hours__c < 8 && emplAvails.size() == 1) {
                 return (' (Available from ' + (emplAvails[0].Date_To__c.addDays(1)).format() + ')');
-            } else if (emplAvails[0].Hours__c == 0 && emplAvails.size() >= 1 && emplAvails[1].Hours__c > 0) {
+            } else if (emplAvails[0].Hours__c < 8 && emplAvails.size() >= 1 && emplAvails[1].Hours__c > 0) {
                 return (' (Available ' + emplAvails[1].Hours__c.intValue() + 'h ' +
                     'from ' + (emplAvails[0].Date_To__c.addDays(1)).format() + ')');
             } else if (emplAvails[0].Hours__c == 8 && emplAvails.size() >= 1) {
