@@ -416,7 +416,7 @@
                                     <th>Dec 2017</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="developer in tableData | paginator:paginator" >
+                                    <tr ng-repeat="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | paginator:paginator" >
                                         <td>{{developer.contact.Name}}</td>
                                         <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
 
