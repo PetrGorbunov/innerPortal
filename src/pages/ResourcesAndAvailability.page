@@ -703,8 +703,8 @@
             $scope.tableData = [];
             $scope.tableFields = tableFields;
             $scope.getValue = function(objectIn, path) {
-                return path.split('.').reduce(function(prevValue, value) {
-                    return (prevValue != null && prevValue.hasOwnProperty(value)) ? prevValue[value] : null;
+                return path.split('.').reduce(function(prevObject, pathName) {
+                    return (prevObject != null && prevObject.hasOwnProperty(pathName)) ? prevObject[pathName] : null;
                 }, objectIn);
             }
 
