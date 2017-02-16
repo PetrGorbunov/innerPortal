@@ -2,11 +2,13 @@
     showHeader="true"
     sidebar="false"
     title="Resources&Availability"
-    standardStylesheets="false">
+    standardStylesheets="false"
+    applyBodyTag="false"
+    docType="html-5.0"
+    >
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
-
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -26,6 +28,11 @@
             flex-direction: column;
         }
 
+        .addInfoBodyLeft {
+            border: 1px solid lightgrey;
+            margin: 0px 0px 5px  0px;
+        }
+
         .addInfoBody {
             border: 1px solid lightgrey;
             margin: 0px 0px 5px  0px;
@@ -41,9 +48,11 @@
             width:auto;
             display:inline-block;
         }
+
         .form-group {
             margin: 0px;
         }
+
         .container {
             width: auto;
             height: 100%;
@@ -60,9 +69,11 @@
         .paddingBottom {
             padding-bottom: 20px;
         }
+
         .left-column {
             padding-right: 0px;
         }
+
         .right-column {
             padding-left: 0px;
         }
@@ -75,16 +86,17 @@
             background-color: hotpink;
         }
         .yellow {
-            background-color: #EFDC5D;
+            background-color: #FFE53A;
         }
 
         .yellow:hover {
-            background-color: #E4C707;
+            background-color: #FFDE00;
         }
 
         .lightblue {
             background-color: lightblue;
         }
+
         .lightgreen {
             background-color: #8FF78D;
         }
@@ -93,6 +105,7 @@
         .lightgreen:hover {
             background-color: #4AFA47;
         }
+
         .blue {
             background: #8D9BF7;
             color: white;
@@ -107,7 +120,7 @@
         }
 
         .concaveYellow {
-            background: linear-gradient(to bottom, #EFDC5D, #FEFCEA);
+            background: linear-gradient(to bottom, #FFE53A, #FEFCEA);
         }
 
         .weight {
@@ -166,7 +179,6 @@
             -webkit-transform: translateX(100%);
             transform: translateX(100%);
         }
-
 
     </style>
 
@@ -255,7 +267,7 @@
                                     <th>Account</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.columns:false | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
+                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.columns:false | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.availabilityHours <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
                                         <td>{{developer.contact.Name}}</td>
                                         <td>{{developer.contact.Job_Title__c}}</td>
                                         <td>{{developer.contact.Experience_Level__c}}</td>
@@ -270,12 +282,12 @@
                                         <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
                                         <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
-                                    <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end" class="addInfoBlock">
-                                       <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.Immediate <= 4 ? 'concaveYellow' : 'concaveGreen')" >
+                                    <tr ng-if="isAddInfoVisible" ng-repeat-end="ng-repeat-end" class="addInfoBlock">
+                                       <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.availabilityHours <= 4 ? 'concaveYellow' : 'concaveGreen')" >
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <p class="AddInfoTitle">Contact Infornation</p>
-                                                    <div class="addInfoBody">
+                                                    <div id="addInfoBodyLeft" class="addInfoBody" master="master" >
                                                         <div class="withoutMarge row">
                                                             <div class="key col-md-4">Email</div>
                                                             <div class="value col-md-8">{{developer.contact.Email}}</div>
@@ -313,7 +325,7 @@
                                                 </div>
                                                 <div class="col-md-4 ">
                                                     <p class="AddInfoTitle">Project Historical Data</p>
-                                                    <div class="addInfoBody scroll" >
+                                                    <div class="addInfoBody scroll" ng-style="style">
                                                         <div class="row borderBottom" ng-repeat="project in developer.contact.Resource_Projects__r">
                                                             <div class="withoutMarge col-md-6 text-left" >
                                                                 {{project.Project__r.Name}}
@@ -328,7 +340,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <p class="AddInfoTitle">Skills and Certificates</p>
-                                                    <div class="addInfoBody scroll">
+                                                    <div class="addInfoBody scroll" ng-style="style">
                                                         <p class="withoutMarge" ng-repeat="skill in developer.contact.Employees__r.Skill__r.Name">
                                                             {{skill}}
                                                         </p>
@@ -347,35 +359,27 @@
                                                     </select>
                                                 </div>
 
-                                                    <div class="col-md-2 withoutMarge text-center form-horizontal" >
-                                                        <div class="input-group date" id="datetimepicker1" >
-                                                            <input id="inpFromDate" type="text" class="form-control" />
-                                                            <span class="input-group-addon">
-                                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-2 withoutMarge text-center form-horizontal" >
-                                                        <div class="input-group date" id="datetimepicker2">
-                                                            <input id="inputToDate" type="text" class="form-control" />
-                                                            <span class="input-group-addon">
-                                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-4 withoutMarge vcenter text-center" >
-                                                        <label for="slcBusyness">Busyness:</label>
-                                                        <select id="slcBusyness" class="form-control">
-                                                            <option >8 Hours</option>
-                                                            <option >4 Hours</option>
-                                                        </select>
-                                                        <button id="btnBookmarkFromAddInfo" class="btn btn-default ">
-                                                            Bookmark
-                                                        </button>
-                                                    </div>
+                                                <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                    <label for="dateFrom">From:</label>
+                                                    <input id="dateFrom"  type="date" name="dateFrom" class="form-control" ng-model="dateFrom" />
                                                 </div>
+
+                                                <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                    <label for="dateTo">To:</label>
+                                                    <input id="dateTo"  type="date" name="dateTo" class="form-control" ng-model="dateTo"  />
+                                                </div>
+
+                                                <div class="col-md-4 withoutMarge vcenter text-center" >
+                                                    <label for="slcBusyness">Busyness:</label>
+                                                    <select id="slcBusyness" class="form-control">
+                                                        <option >8 Hours</option>
+                                                        <option >4 Hours</option>
+                                                    </select>
+                                                    <button id="btnBookmarkFromAddInfo" class="btn btn-default ">
+                                                        Bookmark
+                                                    </button>
+                                                </div>
+                                            </div>
                                        </td>
                                     </tr>
                                 </tbody>
@@ -400,9 +404,7 @@
                                 <tbody>
                                     <tr ng-repeat="developer in tableData | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" >
                                         <td>{{developer.contact.Name}}</td>
-                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
-
-                                        </td>
+                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -441,7 +443,6 @@
                                 <label> of {{paginator.numberOfPages()}} </label>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -479,7 +480,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -631,6 +631,19 @@
             }
         }]);
 
+        ResAndAvailApp.directive( 'master', function() {
+            return {
+                restrict: 'AE',
+                link: function( scope, elem, attrs ) {
+                    scope.$watch( function() {
+                        scope.style = {
+                            height: elem[0].offsetHeight + 'px'
+                        }
+                    });
+                }
+            }
+        });
+
         ResAndAvailApp.controller('ResAndAvailCtrl', ['$scope', '$filter' ,'getData', function($scope, $filter, getData) {
 
             $scope.bookmarkedPeople = [];
@@ -734,10 +747,8 @@
                 }
             };
             $scope.updateDataFromServer();
-
         }]);
 
     </script>
-
 
 </apex:page>
