@@ -31,12 +31,12 @@
 
         .addInfoBodyLeft {
             border: 1px solid lightgrey;
-            margin: 0px 0px 5px  0px;
+            margin: 0px 0px 5px 0px;
         }
 
         .addInfoBody {
             border: 1px solid lightgrey;
-            margin: 0px 0px 5px  0px;
+            margin: 0px 0px 5px 0px;
         }
 
         .addInfoBookmark {
@@ -46,8 +46,8 @@
         }
 
         .form-control {
-            width:auto;
-            display:inline-block;
+            width: auto;
+            display: inline-block;
         }
         .form-group {
             margin: 0px;
@@ -148,18 +148,13 @@
         }
 
         .withoutPadding {
-            padding: 0px;
+            padding: 0px !important;
         }
 
         .borderBottom {
             border-bottom: 1px dotted black;
             margin: 10px;
             padding-bottom: 10px;
-        }
-
-        .scroll {
-            overflow-y: scroll;
-            overflow-x: hidden;
         }
 
         .addInfoBlock {
@@ -177,6 +172,38 @@
             transform: translateX(100%);
         }
 
+        .AddDataBlock {
+            display: flex;
+        }
+
+        .AddDataSubBlock {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .AddDataSubBlock > div {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: auto;
+            max-height: 13.5em;
+            overflow-y: auto;
+        }
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        .textGrey {
+            color: grey;
+        }
+
+        .mainTableHeader {
+            text-align: center;
+        }
+
+        .mainTableHeader:hover {
+            background-color: lightgray;
+        }
 
     </style>
 
@@ -252,28 +279,25 @@
                         <div id="divMainTable" >
 
                             <!-- Table view -->
-                            <table class="table"  ng-if="!isMapChanged">
+                            <table class="table" ng-if="!isMapChanged">
                                 <thead>
-                                    <th ng-repeat="field in tableFields">
-                                      <a ng-click="sort.changeSort(field.fieldName)" ng-if="field.type != 'defaultString'">
-                                        <div>
+                                    <th ng-repeat="field in tableFields" class="pointer withoutPadding mainTableHeader">
+                                        <div ng-click="sort.changeSort(field.fieldName)" ng-if="field.type != 'defaultString'" class="withoutPadding">
                                             {{field.label}}
                                             <span ng-show="sort.sortColumn == field.fieldName && !sort.sortReverse">▲</span>
                                             <span ng-show="sort.sortColumn == field.fieldName && sort.sortReverse">▼</span>
                                         </div>
-                                      </a>
-                                      <a ng-click="sort.defaultReverse = !sort.defaultReverse" ng-if="field.type == 'defaultString'" style="color: gray;">
-                                        <div>
+                                        <div ng-click="sort.defaultReverse = !sort.defaultReverse" ng-if="field.type == 'defaultString'" class="withoutPadding textGrey" >
                                             {{field.label}}
                                             <span ng-show="sort.defaultColumn == field.fieldName && !sort.defaultReverse">▲</span>
                                             <span ng-show="sort.defaultColumn == field.fieldName && sort.defaultReverse">▼</span>
                                         </div>
-                                      </a>
                                     </th>
                                 </thead>
                                 <tbody>
                                     <!-- Main rows of table -->
-                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.getColumns() | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.availabilityHours <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
+                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.getColumns() | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.availabilityHours <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible" class="pointer"
+                                    >
                                         <td ng-repeat="field in tableFields">
                                             <div ng-if="$index == 0" class="ng-hide">
                                                 {{developer}}
@@ -298,8 +322,8 @@
                                     <!-- Add information for row -->
                                     <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end" class="addInfoBlock">
                                        <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.availabilityHours <= 4 ? 'concaveYellow' : 'concaveGreen')" >
-                                            <div class="row">
-                                                <div class="col-md-4">
+                                            <div class="AddDataBlock">
+                                                <div class="col-md-4 AddDataSubBlock">
                                                     <p class="AddInfoTitle">Contact Infornation</p>
                                                     <div class="addInfoBody">
                                                         <div class="withoutMarge row">
@@ -337,9 +361,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4 ">
+                                                <div class="col-md-4 AddDataSubBlock ">
                                                     <p class="AddInfoTitle">Project Historical Data</p>
-                                                    <div class="addInfoBody scroll" >
+                                                    <div class="addInfoBody " >
                                                         <div class="row borderBottom" ng-repeat="project in developer.contact.Resource_Projects__r">
                                                             <div class="withoutMarge col-md-4 text-left" >
                                                                 {{project.Project__r.Name}}
@@ -352,9 +376,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 AddDataSubBlock">
                                                     <p class="AddInfoTitle">Skills and Certificates</p>
-                                                    <div class="addInfoBody scroll">
+                                                    <div class="addInfoBody ">
                                                         <p class="withoutMarge" ng-repeat="skill in developer.contact.Employees__r">
                                                             {{skill.Skill__r.Name}}
                                                         </p>
