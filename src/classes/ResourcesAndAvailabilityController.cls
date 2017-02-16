@@ -203,8 +203,10 @@ public with sharing class ResourcesAndAvailabilityController {
 
         private NEW_Project_Resource__c getCurrentProject(List<NEW_Project_Resource__c> projects) {
             for (NEW_Project_Resource__c projResItem : projects) {
-                if (projResItem.Start_Date__c <= Date.today() && projResItem.End_Date__c >= Date.today()) {
-                    return projResItem;
+                if (projResItem.Start_Date__c <= Date.today()) {
+                    if (projResItem.End_Date__c == null || projResItem.End_Date__c >= Date.today()) {
+                        return projResItem;
+                    }
                 }
             }
             return null;
