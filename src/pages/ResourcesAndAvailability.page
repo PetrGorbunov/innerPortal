@@ -2,7 +2,10 @@
     showHeader="true"
     sidebar="false"
     title="Resources&Availability"
-    standardStylesheets="false">
+    standardStylesheets="false"
+    applyBodyTag="false"
+    docType="html-5.0"
+    >
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
@@ -24,6 +27,11 @@
         .same-row > [class*='col-'] {
             display: flex;
             flex-direction: column;
+        }
+
+        .addInfoBodyLeft {
+            border: 1px solid lightgrey;
+            margin: 0px 0px 5px  0px;
         }
 
         .addInfoBody {
@@ -75,11 +83,12 @@
             background-color: hotpink;
         }
         .yellow {
-            background-color: #EFDC5D;
+            background-color: #FFE53A;
         }
 
         .yellow:hover {
-            background-color: #E4C707;
+            background-color: #FFDE00;
+
         }
 
         .lightgreen {
@@ -108,7 +117,7 @@
         }
 
         .concaveYellow {
-            background: linear-gradient(to bottom, #EFDC5D, #FEFCEA);
+            background: linear-gradient(to bottom, #FFE53A, #FEFCEA);
         }
 
         .weight {
@@ -365,21 +374,13 @@
                                                 </div>
 
                                                 <div class="col-md-2 withoutMarge text-center form-horizontal" >
-                                                    <div class="input-group date" id="datetimepicker1" >
-                                                        <input id="inpFromDate" type="text" class="form-control" />
-                                                        <span class="input-group-addon">
-                                                            <span class="glyphicon glyphicon-calendar"></span>
-                                                        </span>
-                                                    </div>
+                                                    <label for="dateFrom">From:</label>
+                                                    <input id="dateFrom"  type="date" name="dateFrom" class="form-control" ng-model="dateFrom" />
                                                 </div>
 
                                                 <div class="col-md-2 withoutMarge text-center form-horizontal" >
-                                                    <div class="input-group date" id="datetimepicker2">
-                                                        <input id="inputToDate" type="text" class="form-control" />
-                                                        <span class="input-group-addon">
-                                                            <span class="glyphicon glyphicon-calendar"></span>
-                                                        </span>
-                                                    </div>
+                                                    <label for="dateTo">To:</label>
+                                                    <input id="dateTo"  type="date" name="dateTo" class="form-control" ng-model="dateTo"  />
                                                 </div>
 
                                                 <div class="col-md-4 withoutMarge vcenter text-center" >
@@ -418,7 +419,7 @@
                                 <tbody>
                                     <tr ng-repeat="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | paginator:paginator" >
                                         <td>{{developer.contact.Name}}</td>
-                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
+                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.availabilityHours <= 4 ? 'yellow' : 'lightgreen')">
 
                                         </td>
                                     </tr>
