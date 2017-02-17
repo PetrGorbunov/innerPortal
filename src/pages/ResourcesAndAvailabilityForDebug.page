@@ -2,7 +2,10 @@
     showHeader="true"
     sidebar="false"
     title="Resources&Availability"
-    standardStylesheets="false">
+    standardStylesheets="false"
+    applyBodyTag="false"
+    docType="html-5.0"
+    >
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"/>
@@ -26,9 +29,14 @@
             flex-direction: column;
         }
 
+        .addInfoBodyLeft {
+            border: 1px solid lightgrey;
+            margin: 0px 0px 5px 0px;
+        }
+
         .addInfoBody {
             border: 1px solid lightgrey;
-            margin: 0px 0px 5px  0px;
+            margin: 0px 0px 5px 0px;
         }
 
         .addInfoBookmark {
@@ -38,8 +46,8 @@
         }
 
         .form-control {
-            width:auto;
-            display:inline-block;
+            width: auto;
+            display: inline-block;
         }
         .form-group {
             margin: 0px;
@@ -75,16 +83,14 @@
             background-color: hotpink;
         }
         .yellow {
-            background-color: #EFDC5D;
+            background-color: #FFE53A;
         }
 
         .yellow:hover {
-            background-color: #E4C707;
+            background-color: #FFDE00;
+
         }
 
-        .lightblue {
-            background-color: lightblue;
-        }
         .lightgreen {
             background-color: #8FF78D;
         }
@@ -94,6 +100,9 @@
             background-color: #4AFA47;
         }
 
+        .lightblue {
+            background-color: lightblue;
+        }
         .blue {
             background: #8D9BF7;
             color: white;
@@ -108,7 +117,7 @@
         }
 
         .concaveYellow {
-            background: linear-gradient(to bottom, #EFDC5D, #FEFCEA);
+            background: linear-gradient(to bottom, #FFE53A, #FEFCEA);
         }
 
         .weight {
@@ -139,18 +148,17 @@
         }
 
         .withoutPadding {
-            padding: 0px;
+            padding: 0px !important;
+        }
+
+        .withoutPaddingBottom {
+            padding-bottom: 0px;
         }
 
         .borderBottom {
             border-bottom: 1px dotted black;
             margin: 10px;
             padding-bottom: 10px;
-        }
-
-        .scroll {
-            overflow-y: scroll;
-            overflow-x: hidden;
         }
 
         .addInfoBlock {
@@ -168,115 +176,225 @@
             transform: translateX(100%);
         }
 
+        .AddDataBlock {
+            display: flex;
+        }
+
+        .AddDataSubBlock {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .AddDataSubBlock > div {
+            flex-grow: 1;
+            flex-shrink: 1;
+            flex-basis: auto;
+            max-height: 13.5em;
+            overflow-y: auto;
+        }
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        .textGrey {
+            color: grey;
+        }
+
+        .mainTableHeader {
+            text-align: center;
+        }
+
+        .mainTableHeader:hover {
+            background-color: lightgray;
+        }
+
+        .spinner {
+            display: flex;
+            height: 300px;
+        }
+
+        .spinner > div {
+            margin: auto;
+        }
+
+        .bookmark {
+            border: 1px solid;
+            margin: 0px 10px 5px 5px;
+        }
+
+        .bookmarkText {
+            border-right: 1px solid;
+            padding: 0px 5px;
+        }
+
+        .bookmarkImage {
+            padding: 0px 2px;
+        }
+
+        .bookmarkImage:hover {
+            background-color: darkblue;
+        }
+
+        #bookmakerViewer > div {
+            display: flex;
+            padding-right: 10px;
+        }
+
+        .bookmarkColumn {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 5px;
+        }
+
+        .bookmarkRow {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-content: space-between;
+        }
 
     </style>
 
     <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">
-        <div ng-show="getDataStatus != 'Finished'">
-            Loading data... Please wait...
+        <!-- Header panel -->
+        <div class="row">
+            <div id="divHeader" class="col-md-12">
+                <div class="container lightblue">
+                    <apex:image id="VRPLogo" url="{!URLFOR($Resource.vrprce__Logos, '/VRP.png')}" height="10%" width="10%"/>
+                    VRP Thinking globally, delivering locally
+                </div>
+            </div>
         </div>
 
+        <!-- Spinner panel -->
+        <div ng-show="getDataStatus != 'Finished'" class="spinner">
+            <div>
+                <img src="/img/waiting_dots.gif" />
+            </div>
+        </div>
+
+        <!-- Main block -->
         <div ng-show="getDataStatus == 'Finished'" class="ng-hide">
+            <!-- Bookmarks panel -->
+            <div class="row container blue withoutPaddingBottom" >
+                <div id="bookmakerViewer" class="col-md-10">
+                    <div>
+                        <div class="bookmarkColumn" >
+                            Bookmarked:
+                        </div>
 
-            <!-- Header's panels -->
+                        <div class="bookmarkRow" >
+                            <span ng-show="bookmarkedPeople.length == 0">
+                                None
+                            </span>
+                            <div ng-repeat="contact in bookmarkedPeople" class="bookmark">
+                                <span class="bookmarkText" >
+                                    {{contact}}
+                                </span>
+                                <span class="bookmarkImage pointer" ng-click="removeBookMark(contact)" >
+                                    <img style="" src="/img/func_icons/remove12_on.gif" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 text-center vcenter">
+                    <button id="btnReserve" class="btn btn-default" ng-show="bookmarkedPeople.length > 0">
+                        Reserve / Allocate Selected
+                    </button>
+                </div>
+            </div>
+
+            <!-- Searching panel -->
             <div class="row">
-                <!-- Header with logo -->
-                <div id="divHeader" class="col-md-12">
-                    <div class="container lightblue">
-                        <apex:image id="VRPLogo" url="{!URLFOR($Resource.vrprce__Logos, '/VRP.png')}" height="10%" width="10%" />
-                        VRP Thinking globally, delivering locally
-                    </div>
-                </div>
-
-                <!-- Bookmarks panel -->
-                <div id="bookmakerViewer" class="col-md-12">
-                    <div class="container blue">
-                        Bookmarked:
-                        <span ng-show="bookmarkedPeople.length == 0">
-                            None
-                        </span>
-                        <button id="btnReserve" class="btn btn-default" ng-show="bookmarkedPeople.length > 0">
-                            Reserve / Allocate Selected
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Searching panel -->
                 <div class="col-md-12">
                     <div class="container blue">
-                            <div class="col-md-5 text-center">
-                                <label for="slcProjects">Projects</label>
-                                <select id="slcProjects" class="form-control">
-                                    <option ng-repeat="project in allDataFromServer.Projects">{{project.Name}}</option>
-                                </select>
+                        <div class="col-md-5 text-center">
+                            <label for="slcProjects">Projects</label>
+                            <select id="slcProjects" class="form-control" ng-options="project.Name for project in allDataFromServer.Projects" ng-model="filters.selectedProject">
+                            </select>
 
-                                <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbProjectHistory"/>
-                                    Include historical data
-                                </label>
-                            </div>
+                            <label class="checkbox-inline" >
+                                <input type="checkbox" id="chbProjectHistory" ng-model="filters.projectHistory"/>
+                                Include historical data
+                            </label>
+                        </div>
 
-                            <div class="col-md-5 text-center">
-                                <label for="slcClients">Client</label>
-                                <select id="slcClients" class="form-control">
-                                    <option ng-repeat="client in allDataFromServer.Clients">{{client.Account__r.Name}}</option>
-                                </select>
+                        <div class="col-md-5 text-center">
+                            <label for="slcClients">Client</label>
+                            <select id="slcClients" class="form-control" ng-options="client.Account__r.Name for client in allDataFromServer.Clients" ng-model="filters.selectedClient">
+                            </select>
 
-                                <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbClientHistory"/>
-                                    Include historical data
-                                </label>
-                            </div>
+                            <label class="checkbox-inline" >
+                                <input type="checkbox" id="chbClientHistory" ng-model="filters.clientHistory"/>
+                                Include historical data
+                            </label>
+                        </div>
 
-                            <div class="col-md-2 text-center vcenter">
-                                <button id="btnMapView" class="" ng-click="changeMapView()">
-                                    {{isMapChanged ? "Table View" : "Map View"}}
-                                </button>
-                            </div>
+                        <div class="col-md-2 text-center vcenter">
+                            <button id="btnMapView" class="" ng-click="changeMapView()">
+                                {{isMapChanged ? "Table View" : "Map View"}}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Main table block -->
+            <!-- Main table panel -->
             <div class="row same-row">
                 <div class="col-md-10 left-column ">
                     <div class="container">
+                        <div id="divMainTable">
 
-                        <div id="divMainTable" >
-                            <table class="table"  ng-if="!isMapChanged" >
+                            <!-- Table view -->
+                            <table class="table" ng-if="!isMapChanged">
                                 <thead>
-                                    <th>Full Name</th>
-                                    <th>Department</th>
-                                    <th>Experience Level</th>
-                                    <th>English Level</th>
-                                    <th>US Visa</th>
-                                    <th>Immediate Availability (h)</th>
-                                    <th>Project Allocation</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Team Lead</th>
-                                    <th>Account</th>
+                                    <th ng-repeat="field in tableFields" class="pointer withoutPadding mainTableHeader">
+                                        <div ng-click="sort.changeSort(field.fieldName)" ng-if="field.type != 'defaultString'" class="withoutPadding">
+                                            {{field.label}}
+                                            <span ng-show="sort.sortColumn == field.fieldName && !sort.sortReverse">▲</span>
+                                            <span ng-show="sort.sortColumn == field.fieldName && sort.sortReverse">▼</span>
+                                            <span ng-show="sort.sortColumn != field.fieldName" style="opacity: 0;">▼</span>
+                                        </div>
+                                        <div ng-click="sort.defaultReverse = !sort.defaultReverse" ng-if="field.type == 'defaultString'" class="withoutPadding textGrey" >
+                                            {{field.label}}
+                                            <span ng-show="!sort.defaultReverse">▲</span>
+                                            <span ng-show="sort.defaultReverse">▼</span>
+                                        </div>
+                                    </th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat-start="developer in tableData | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible">
-                                        <td>{{developer.contact.Name}}</td>
-                                        <td>{{developer.contact.Job_Title__c}}</td>
-                                        <td>{{developer.contact.Experience_Level__c}}</td>
-                                        <td>{{developer.contact.English_Level__c}}</td>
-                                        <td>
-                                            <span ng-show="developer.contact.Employee_Private_Documents__r"> <apex:image value="/img/permissions_confirm16.gif" /></span>
+                                    <!-- Main rows of table -->
+                                    <tr ng-repeat-start="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | orderBy:sort.getColumns() | paginator:paginator" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.availabilityHours <= 4 ? 'yellow' : 'lightgreen')" ng-click="isAddInfoVisible = !isAddInfoVisible" class="pointer"
+                                    >
+                                        <td ng-repeat="field in tableFields">
+                                            <div ng-if="$index == 0" class="ng-hide">
+                                                {{developer}}
+                                            </div>
+                                            <div ng-if="field.type == 'string'">
+                                                {{getValue(developer, field.fieldName)}}
+                                            </div>
+                                            <div ng-if="field.type == 'defaultString'">
+                                                {{getValue(developer, field.fieldName)}}
+                                            </div>
+                                            <div ng-if="field.type == 'boolean'">
+                                                <span ng-show="getValue(developer, field.fieldName)"><apex:image value="/img/permissions_confirm16.gif"/></span>
+                                            </div>
+                                            <div ng-if="field.type == 'addString'">
+                                                {{getValue(developer, field.fieldName)}}{{getValue(developer, field.addFieldName)}}
+                                            </div>
+                                            <div ng-if="field.type == 'date'">
+                                                {{getValue(developer, field.fieldName) | date:"MM/dd/yyyy"}}
+                                            </div>
                                         </td>
-                                        <td>{{developer.availabilityHours}} {{developer.availabilityAddInfo}}</td>
-                                        <td>{{developer.currentProject.Project__r.Name}}</td>
-                                        <td>{{developer.currentProject.Start_Date__c | date:"mm/dd/yyyy"}}</td>
-                                        <td>{{developer.currentProject.End_Date__c | date:"mm/dd/yyyy"}}</td>
-                                        <td>{{developer.contact.Employee_User__r.Manager.Name}}</td>
-                                        <td>{{developer.contact.Account.Name}}</td>
                                     </tr>
+                                    <!-- Add information for row -->
                                     <tr ng-show="isAddInfoVisible" ng-repeat-end="ng-repeat-end" class="addInfoBlock">
-                                       <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.Immediate <= 4 ? 'concaveYellow' : 'concaveGreen')" >
-                                            <div class="row">
-                                                <div class="col-md-4">
+                                       <td colspan="11" ng-class="developer.availabilityHours == 0 ? 'concaveRed' : (developer.availabilityHours <= 4 ? 'concaveYellow' : 'concaveGreen')" >
+                                            <div class="AddDataBlock">
+                                                <div class="col-md-4 AddDataSubBlock">
                                                     <p class="AddInfoTitle">Contact Infornation</p>
                                                     <div class="addInfoBody">
                                                         <div class="withoutMarge row">
@@ -314,14 +432,14 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4 ">
+                                                <div class="col-md-4 AddDataSubBlock ">
                                                     <p class="AddInfoTitle">Project Historical Data</p>
-                                                    <div class="addInfoBody scroll" >
+                                                    <div class="addInfoBody " >
                                                         <div class="row borderBottom" ng-repeat="project in developer.contact.Resource_Projects__r">
-                                                            <div class="withoutMarge col-md-6 text-left" >
+                                                            <div class="withoutMarge col-md-4 text-left" >
                                                                 {{project.Project__r.Name}}
                                                             </div>
-                                                            <div class="withoutMarge col-md-6 text-right" >
+                                                            <div class="withoutMarge col-md-8 text-right" >
                                                                 {{project.Start_Date__c | date:"MMMM yyyy"}}
                                                                 -
                                                                 {{project.End_Date__c | date:"MMMM yyyy"}}
@@ -329,61 +447,50 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-4 AddDataSubBlock">
                                                     <p class="AddInfoTitle">Skills and Certificates</p>
-                                                    <div class="addInfoBody scroll">
-                                                        <p class="withoutMarge" ng-repeat="skill in developer.contact.Employees__r.Skill__r.Name">
-                                                            {{skill}}
+                                                    <div class="addInfoBody ">
+                                                        <p class="withoutMarge" ng-repeat="skill in developer.contact.Employees__r">
+                                                            {{skill.Skill__r.Name}}
                                                         </p>
-                                                        <p class="withoutMarge" ng-repeat="certificate in developer.contact.Employees_Certifications__r.Certificate__r.Name">
-                                                            {{certificate}}
+                                                        <p class="withoutMarge" ng-repeat="certificate in developer.contact.Employee_Certifications__r">
+                                                            {{certificate.Certificate__r.Name}}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="row addInfoBookmark">
-                                                <div class="col-md-4 withoutMarge text-center" >
+                                                <div class="col-md-4 withoutMarge text-center" ng-init="selectedProject = allDataFromServer.Projects[1]">
                                                     <label for="slcProjectsForAllocation">Select Project for Allocation:</label>
-                                                    <select id="slcProjectsForAllocation" class="form-control">
-                                                        <option ng-repeat="project in allDataFromServer.Projects">{{project.Name}}</option>
-                                                    </select>
+                                                    <select id="slcProjectsForAllocation" class="form-control" ng-options="project as project.Name for project in allDataFromServer.Projects.slice(1)" ng-model="selectedProject"></select>
                                                 </div>
 
-                                                    <div class="col-md-2 withoutMarge text-center form-horizontal" >
-                                                        <div class="input-group date" id="datetimepicker1" >
-                                                            <input id="inpFromDate" type="text" class="form-control" />
-                                                            <span class="input-group-addon">
-                                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                                <div class="col-md-5 withoutMarge text-center form-horizontal" ng-init="dateFrom = $parent.currentDate; dateTo = $parent.currentDate;">
+                                                    <label for="dateFrom">From:</label>
+                                                    <input id="dateFrom" type="date" name="dateFrom" class="form-control" ng-model="dateFrom"/>
+                                                    <label for="dateTo">To:</label>
+                                                    <input id="dateTo" type="date" name="dateTo" class="form-control" ng-model="dateTo"/>
+                                                </div>
 
-                                                    <div class="col-md-2 withoutMarge text-center form-horizontal" >
-                                                        <div class="input-group date" id="datetimepicker2">
-                                                            <input id="inputToDate" type="text" class="form-control" />
-                                                            <span class="input-group-addon">
-                                                                <span class="glyphicon glyphicon-calendar"></span>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-md-4 withoutMarge vcenter text-center" >
-                                                        <label for="slcBusyness">Busyness:</label>
-                                                        <select id="slcBusyness" class="form-control">
-                                                            <option >8 Hours</option>
-                                                            <option >4 Hours</option>
-                                                        </select>
-                                                        <button id="btnBookmarkFromAddInfo" class="btn btn-default ">
+                                                <div class="col-md-2 withoutMarge vcenter text-center" ng-init="selectedHours = 8">
+                                                    <label for="slcBusyness">Busyness:</label>
+                                                    <select id="slcBusyness" class="form-control" ng-model="selectedHours" ng-options="hours for hours in [8, 4, 2]"></select>
+                                                </div>
+                                                <div class="col-md-1 withoutMarge vcenter">
+                                                    <div>
+                                                        <button id="btnBookmarkFromAddInfo" class="btn btn-default" ng-click="bookmark(this);" style="height: 2.5em;">
                                                             Bookmark
                                                         </button>
                                                     </div>
                                                 </div>
-                                       </td>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
 
+                            <!-- Map view -->
                             <table class="table"  ng-if="isMapChanged" >
                                 <thead>
                                     <th>Full Name</th>
@@ -401,9 +508,9 @@
                                     <th>Dec 2017</th>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="developer in tableData | startFrom: paginator.currentPage * paginator.developersPerPage | limitTo: paginator.developersPerPage" >
+                                    <tr ng-repeat="developer in tableData | projects:filters.selectedProject:filters.projectHistory | clients:filters.selectedClient:filters.clientHistory | accounts:filters.accounts | departments:filters.departments | available:filters.immediateAvailable | paginator:paginator" >
                                         <td>{{developer.contact.Name}}</td>
-                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.Immediate <= 4 ? 'yellow' : 'lightgreen')">
+                                        <td colspan="12" ng-class="developer.availabilityHours == 0 ? 'hotpink' : (developer.availabilityHours <= 4 ? 'yellow' : 'lightgreen')">
 
                                         </td>
                                     </tr>
@@ -415,10 +522,10 @@
                         <div id="PaginationBlock" class="row ">
                             <div class="col-md-4 my-col text-left">
                                 <label for="slcRecordsOnPage" >Records on page</label>
-                                <select   ng-model="paginator.developersPerPage"
-                                          ng-options="records for records in paginator.POSSIBLE_DEVELOPERS_PER_PAGE"
-                                          id="slcRecordsOnPage"
-                                          class="form-control">
+                                <select ng-model="paginator.developersPerPage"
+                                        ng-options="records for records in paginator.POSSIBLE_DEVELOPERS_PER_PAGE"
+                                        id="slcRecordsOnPage"
+                                        class="form-control">
                                 </select>
                             </div>
                             <div class="col-md-4 my-col text-center">
@@ -436,10 +543,10 @@
                             </div>
                             <div class="col-md-4 my-col text-right">
                                 <label for="slcPages" >Page</label>
-                                <select   ng-model="paginator.currentPage"
-                                          ng-options="page as page+1 for page in paginator.pages()"
-                                          id="slcPages"
-                                          class="form-control">
+                                <select ng-model="paginator.currentPage"
+                                        ng-options="page + 1 for page in paginator.pages()"
+                                        id="slcPages"
+                                        class="form-control">
                                 </select>
                                 <label> of {{paginator.numberOfPages()}} </label>
                             </div>
@@ -457,24 +564,24 @@
                         <div>
                             <div class="paddingBottom">
                                 <p class="weight">Account</p>
-                                <div ng-repeat="account in allDataFromServer.Accounts">
-                                    <label class="checkbox-inline"  >
-                                        <input type="checkbox" /> {{account}}
+                                <div ng-repeat="account in filters.accounts">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" ng-model="account['Checked']"/> {{account.Name}}
                                     </label>
                                 </div>
                             </div>
                             <div class="paddingBottom">
                                 <p class="weight">Department</p>
-                                <div ng-repeat="department in allDataFromServer.Departments" >
+                                <div ng-repeat="department in filters.departments" >
                                     <label class="checkbox-inline" >
-                                        <input type="checkbox" /> {{department}}
+                                        <input type="checkbox" ng-model="department['Checked']"/> {{department.Name}}
                                     </label>
                                 </div>
                             </div>
                             <div class="paddingBottom">
                                 <p class="weight">Immediately available</p>
                                 <label class="checkbox-inline" >
-                                    <input type="checkbox" id="chbAvailable" /> Yes
+                                    <input type="checkbox" id="chbAvailable" ng-model="filters.immediateAvailable"/> Yes
                                 </label>
                             </div>
                         </div>
@@ -489,9 +596,172 @@
 
         var ResAndAvailApp = angular.module('ResAndAvail', []);
 
-        ResAndAvailApp.filter('startFrom', function() {
-            return function(input, start) {
-                return input.slice(start);
+        ResAndAvailApp.constant('tableFields', [
+            {
+                'label': 'Full Name',
+                'fieldName': 'contact.Name',
+                'type': 'string'
+            },
+            {
+                'label': 'Department',
+                'fieldName': 'contact.Job_Title__c',
+                'type': 'defaultString'
+            },
+            {
+                'label': 'Experience Level',
+                'fieldName': 'contact.Experience_Level__c',
+                'type': 'string'
+            },
+            {
+                'label': 'English Level',
+                'fieldName': 'contact.English_Level__c',
+                'type': 'string'
+            },
+            {
+                'label': 'US Visa',
+                'fieldName': 'contact.Employee_Private_Documents__r',
+                'type': 'boolean'
+            },
+            {
+                'label': 'Immediate Availability (h)',
+                'fieldName': 'availabilityHours',
+                'addFieldName': 'availabilityAddInfo',
+                'type': 'addString'
+            },
+            {
+                'label': 'Project Allocation',
+                'fieldName': 'currentProject.Project__r.Name',
+                'type': 'string'
+            },
+            {
+                'label': 'From',
+                'fieldName': 'currentProject.Start_Date__c',
+                'type': 'date'
+            },
+            {
+                'label': 'To',
+                'fieldName': 'currentProject.End_Date__c',
+                'type': 'date'
+            },
+            {
+                'label': 'Team Lead',
+                'fieldName': 'contact.Employee_User__r.Manager.Name',
+                'type': 'string'
+            },
+            {
+                'label': 'Account',
+                'fieldName': 'contact.Account.Name',
+                'type': 'string'
+            }
+        ]);
+
+        ResAndAvailApp.filter('paginator', function() {
+            return function(input, paginator) {
+                if (paginator.developersCount != input.length) {
+                    paginator.developersCount = input.length;
+                    paginator.currentPage = 0;
+                }
+                var startPosition = paginator.currentPage * paginator.developersPerPage;
+                return input.slice(startPosition, startPosition + paginator.developersPerPage);
+            };
+        });
+
+        ResAndAvailApp.filter('projects', function() {
+            return function(input, project, history) {
+                if (!project || !project.hasOwnProperty('Id')) {
+                    return input;
+                }
+                return input.filter(function(value) {
+                    if (!history) {
+                        return (value.hasOwnProperty('currentProject') && value.currentProject.Project__c == project.Id);
+                    }
+                    if (!value.contact.Resource_Projects__r) {
+                        return false;
+                    }
+                    var result = false;
+                    value.contact.Resource_Projects__r.forEach(function(value) {
+                        result = (value.Project__c == project.Id) || result;
+                    });
+                    return result;
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('clients', function() {
+            return function(input, client, history) {
+                if (!client || !client.hasOwnProperty('Id')) {
+                    return input;
+                }
+                return input.filter(function(value) {
+                    if (!history) {
+                        return (value.hasOwnProperty('currentProject') && value.currentProject.Project__r.Customer__c == client.Id);
+                    }
+                    if (!value.contact.Resource_Projects__r) {
+                        return false;
+                    }
+                    var result = false;
+                    value.contact.Resource_Projects__r.forEach(function(value) {
+                        result = (value.Project__r.Customer__c == client.Id) || result;
+                    });
+                    return result;
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('accounts', function() {
+            var someChecked = function(value) {
+                return value.Checked;
+            }
+            var everyChecked = function(value) {
+                return value.Checked;
+            }
+            return function(input, accounts) {
+                if (!accounts.some(someChecked) || accounts.every(everyChecked)) {
+                    return input;
+                }
+                var selectedAccounts = {};
+                accounts.forEach(function(value) {
+                    if (value.Checked) {
+                        selectedAccounts[value.Name] = true;
+                    }
+                });
+                return input.filter(function(value) {
+                    return selectedAccounts.hasOwnProperty(value.contact.Account.Name);
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('departments', function() {
+            var someChecked = function(value) {
+                return value.Checked;
+            }
+            var everyChecked = function(value) {
+                return value.Checked;
+            }
+            return function(input, departments) {
+                if (!departments.some(someChecked) || departments.every(everyChecked)) {
+                    return input;
+                }
+                var selectedDepartments = {};
+                departments.forEach(function(value) {
+                    if (value.Checked) {
+                        selectedDepartments[value.Name] = true;
+                    }
+                });
+                return input.filter(function(value) {
+                    return selectedDepartments.hasOwnProperty(value.contact.Job_Title__c);
+                });
+            };
+        });
+
+        ResAndAvailApp.filter('available', function() {
+            return function(input, available) {
+                if (!available) {
+                    return input;
+                }
+                return input.filter(function(value) {
+                    return value.availabilityHours > 0;
+                });
             };
         });
 
@@ -524,27 +794,77 @@
             }
         }]);
 
-        ResAndAvailApp.controller('ResAndAvailCtrl', ['$scope', '$filter' ,'getData', function($scope, $filter, getData) {
+        ResAndAvailApp.controller('ResAndAvailCtrl', ['$scope', '$filter' ,'getData', 'tableFields', function($scope, $filter, getData, tableFields) {
+            $scope.allDataFromServer = {};
+            $scope.tableData = [];
+            $scope.tableFields = tableFields;
+            $scope.getValue = function(objectIn, path) {
+                return path.split('.').reduce(function(prevObject, pathName) {
+                    return (prevObject != null && prevObject.hasOwnProperty(pathName)) ? prevObject[pathName] : null;
+                }, objectIn);
+            }
+
+            $scope.currentDate = new Date();
+            $scope.bookmarkedPeople = [];
+            $scope.bookmark = function(context) {
+                var newBookmarkEmployee = {
+                    project: context.selectedProject,
+                    dateFrom: context.dateFrom,
+                    dateTo: context.dateTo,
+                    hours: context.selectedHours,
+                    employeeWrapper: context.developer
+                };
+                $scope.bookmarkedPeople.push(newBookmarkEmployee);
+                console.dir($scope.bookmarkedPeople);
+            }
+            $scope.removeBookMark = function(contact) {
+                let index = $scope.bookmarkedPeople.indexOf(contact);
+                $scope.bookmarkedPeople.splice(index, 1);
+            }
+
             $scope.isMapChanged = false;
 
             $scope.changeMapView = function() {
                 $scope.isMapChanged = !$scope.isMapChanged;
             }
 
-            $scope.bookmarkedPeople = [];
+            $scope.filters = {
+                selectedProject: null,
+                projectHistory: false,
+                selectedClient: null,
+                clientHistory: false,
+                accounts: [],
+                departments: [],
+                immediateAvailable: false
+            };
 
-            $scope.allDataFromServer = {};
-            $scope.tableData = [];
-
-            $scope.isAddInfoVisible = false;
+            $scope.sort = {
+                defaultColumn: 'contact.Job_Title__c',
+                defaultReverse: false,
+                sortColumn: 'contact.Name',
+                sortReverse: false,
+                getColumns: function() {
+                    var result = [];
+                    result.push((this.defaultReverse ? '-' : '+') + this.defaultColumn);
+                    result.push((this.sortReverse ? '-' : '+') + this.sortColumn);
+                    return result;
+                },
+                changeSort: function(columnName) {
+                    if (this.sortColumn != columnName) {
+                      this.sortReverse = true;
+                    }
+                    this.sortReverse = !this.sortReverse;
+                    this.sortColumn = columnName;
+                }
+            };
 
             $scope.paginator = {
                 POSSIBLE_DEVELOPERS_PER_PAGE: [5, 10, 20, 50, 100],
                 currentPage: 0,
-                developersPerPage: 5,
+                developersPerPage: 0,
                 developersCount: 0,
                 numberOfPages: function() {
-                    return Math.ceil($scope.tableData.length / this.developersPerPage);
+                    return Math.ceil(this.developersCount / this.developersPerPage);
                 },
                 hasPrevious: function() {
                     return this.currentPage > 0;
@@ -559,7 +879,7 @@
                     this.currentPage = this.currentPage + 1;
                 },
                 showPageInfo: function() {
-                    let fromRecord = this.currentPage * this.developersPerPage + 1;
+                    let fromRecord = (this.developersCount > 0) ? this.currentPage * this.developersPerPage + 1 : 0;
                     let lastRecordOnPage = (this.currentPage + 1) * this.developersPerPage;
                     let toRecord = (lastRecordOnPage > this.developersCount) ? this.developersCount : lastRecordOnPage;
                     return fromRecord + ' - ' + toRecord + ' of ' + this.developersCount;
@@ -571,11 +891,28 @@
                     }
                     return arr;
                 },
+                initPaginator: function() {
+                    this.developersPerPage = this.POSSIBLE_DEVELOPERS_PER_PAGE[0];
+                }
             };
+            $scope.paginator.initPaginator();
 
             $scope.readingDataForTable = function() {
                 $scope.tableData = $scope.allDataFromServer.ContactsWrap;
-                $scope.paginator.developersCount = $scope.tableData.length;
+                $scope.filters.selectedProject = $scope.allDataFromServer.Projects[0];
+                $scope.filters.selectedClient = $scope.allDataFromServer.Clients[0];
+                $scope.filters.accounts = $scope.allDataFromServer.Accounts.map(function(value) {
+                    return {
+                        Name: value,
+                        Checked: false
+                    }
+                });
+                $scope.filters.departments = $scope.allDataFromServer.Departments.map(function(value) {
+                    return {
+                        Name: value,
+                        Checked: false
+                    }
+                });
             }
 
             $scope.updateDataFromServer = function() {
