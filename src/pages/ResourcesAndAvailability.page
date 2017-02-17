@@ -286,11 +286,12 @@
                                             {{field.label}}
                                             <span ng-show="sort.sortColumn == field.fieldName && !sort.sortReverse">▲</span>
                                             <span ng-show="sort.sortColumn == field.fieldName && sort.sortReverse">▼</span>
+                                            <span ng-show="sort.sortColumn != field.fieldName" style="opacity: 0;">▼</span>
                                         </div>
                                         <div ng-click="sort.defaultReverse = !sort.defaultReverse" ng-if="field.type == 'defaultString'" class="withoutPadding textGrey" >
                                             {{field.label}}
-                                            <span ng-show="sort.defaultColumn == field.fieldName && !sort.defaultReverse">▲</span>
-                                            <span ng-show="sort.defaultColumn == field.fieldName && sort.defaultReverse">▼</span>
+                                            <span ng-show="!sort.defaultReverse">▲</span>
+                                            <span ng-show="sort.defaultReverse">▼</span>
                                         </div>
                                     </th>
                                 </thead>
@@ -390,32 +391,28 @@
                                             </div>
 
                                             <div class="row addInfoBookmark">
-                                                <div class="col-md-4 withoutMarge text-center" >
+                                                <div class="col-md-4 withoutMarge text-center" ng-init="selectedProject = allDataFromServer.Projects[1]">
                                                     <label for="slcProjectsForAllocation">Select Project for Allocation:</label>
-                                                    <select id="slcProjectsForAllocation" class="form-control">
-                                                        <option ng-repeat="project in allDataFromServer.Projects">{{project.Name}}</option>
-                                                    </select>
+                                                    <select id="slcProjectsForAllocation" class="form-control" ng-options="project as project.Name for project in allDataFromServer.Projects.slice(1)" ng-model="selectedProject"></select>
                                                 </div>
 
-                                                <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                <div class="col-md-5 withoutMarge text-center form-horizontal" ng-init="dateFrom = $parent.currentDate; dateTo = $parent.currentDate;">
                                                     <label for="dateFrom">From:</label>
-                                                    <input id="dateFrom"  type="date" name="dateFrom" class="form-control" ng-model="dateFrom" />
-                                                </div>
-
-                                                <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                    <input id="dateFrom" type="date" name="dateFrom" class="form-control" ng-model="dateFrom"/>
                                                     <label for="dateTo">To:</label>
-                                                    <input id="dateTo"  type="date" name="dateTo" class="form-control" ng-model="dateTo"  />
+                                                    <input id="dateTo" type="date" name="dateTo" class="form-control" ng-model="dateTo"/>
                                                 </div>
 
-                                                <div class="col-md-4 withoutMarge vcenter text-center" >
+                                                <div class="col-md-2 withoutMarge vcenter text-center" ng-init="selectedHours = 8">
                                                     <label for="slcBusyness">Busyness:</label>
-                                                    <select id="slcBusyness" class="form-control">
-                                                        <option >8 Hours</option>
-                                                        <option >4 Hours</option>
-                                                    </select>
-                                                    <button id="btnBookmarkFromAddInfo" class="btn btn-default ">
-                                                        Bookmark
-                                                    </button>
+                                                    <select id="slcBusyness" class="form-control" ng-model="selectedHours" ng-options="hours for hours in [8, 4, 2]"></select>
+                                                </div>
+                                                <div class="col-md-1 withoutMarge vcenter">
+                                                    <div>
+                                                        <button id="btnBookmarkFromAddInfo" class="btn btn-default" ng-click="bookmark(this);" style="height: 2.5em;">
+                                                            Bookmark
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                        </td>
@@ -737,7 +734,19 @@
                 }, objectIn);
             }
 
+            $scope.currentDate = new Date();
             $scope.bookmarkedPeople = [];
+            $scope.bookmark = function(context) {
+                var newBookmarkEmployee = {
+                    project: context.selectedProject,
+                    dateFrom: context.dateFrom,
+                    dateTo: context.dateTo,
+                    hours: context.selectedHours,
+                    employeeWrapper: context.developer
+                };
+                $scope.bookmarkedPeople.push(newBookmarkEmployee);
+                console.dir($scope.bookmarkedPeople);
+            }
 
             $scope.isMapChanged = false;
 
