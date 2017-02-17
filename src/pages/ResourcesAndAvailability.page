@@ -151,6 +151,10 @@
             padding: 0px !important;
         }
 
+        .withoutPaddingBottom {
+            padding-bottom: 0px;
+        }
+
         .borderBottom {
             border-bottom: 1px dotted black;
             margin: 10px;
@@ -205,39 +209,106 @@
             background-color: lightgray;
         }
 
+        .spinner {
+            display: flex;
+            height: 300px;
+        }
+
+        .spinner > div {
+            margin: auto;
+        }
+
+        .bookmark {
+            border: 1px solid;
+            margin: 0px 10px 5px 5px;
+        }
+
+        .bookmarkText {
+            border-right: 1px solid;
+            padding: 0px 5px;
+        }
+
+        .bookmarkImage {
+            padding: 0px 2px;
+        }
+
+        .bookmarkImage:hover {
+            background-color: darkblue;
+        }
+
+        #bookmakerViewer > div {
+            display: flex;
+            padding-right: 10px;
+        }
+
+        .bookmarkColumn {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 5px;
+        }
+
+        .bookmarkRow {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-content: space-between;
+        }
+
     </style>
 
     <div ng-app="ResAndAvail" ng-controller="ResAndAvailCtrl">
-        <div ng-show="getDataStatus != 'Finished'">
-            Loading data... Please wait...
+        <!-- Header panel -->
+        <div class="row">
+            <div id="divHeader" class="col-md-12">
+                <div class="container lightblue">
+                    <apex:image id="VRPLogo" url="{!URLFOR($Resource.vrprce__Logos, '/VRP.png')}" height="10%" width="10%"/>
+                    VRP Thinking globally, delivering locally
+                </div>
+            </div>
         </div>
 
+        <!-- Spinner panel -->
+        <div ng-show="getDataStatus != 'Finished'" class="spinner">
+            <div>
+                <img src="/img/waiting_dots.gif" />
+            </div>
+        </div>
+
+        <!-- Main block -->
         <div ng-show="getDataStatus == 'Finished'" class="ng-hide">
+            <!-- Bookmarks panel -->
+            <div class="row container blue withoutPaddingBottom" >
+                <div id="bookmakerViewer" class="col-md-10">
+                    <div>
+                        <div class="bookmarkColumn" >
+                            Bookmarked:
+                        </div>
 
-            <!-- Header's panels -->
+                        <div class="bookmarkRow" >
+                            <span ng-show="bookmarkedPeople.length == 0">
+                                None
+                            </span>
+                            <div ng-repeat="contact in bookmarkedPeople" class="bookmark">
+                                <span class="bookmarkText" >
+                                    {{contact}}
+                                </span>
+                                <span class="bookmarkImage pointer" ng-click="removeBookMark(contact)" >
+                                    <img style="" src="/img/func_icons/remove12_on.gif" />
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 text-center vcenter">
+                    <button id="btnReserve" class="btn btn-default" ng-show="bookmarkedPeople.length > 0">
+                        Reserve / Allocate Selected
+                    </button>
+                </div>
+            </div>
+
+            <!-- Searching panel -->
             <div class="row">
-                <!-- Header with logo -->
-                <div id="divHeader" class="col-md-12">
-                    <div class="container lightblue">
-                        <apex:image id="VRPLogo" url="{!URLFOR($Resource.vrprce__Logos, '/VRP.png')}" height="10%" width="10%" />
-                        VRP Thinking globally, delivering locally
-                    </div>
-                </div>
-
-                <!-- Bookmarks panel -->
-                <div id="bookmakerViewer" class="col-md-12">
-                    <div class="container blue">
-                        Bookmarked:
-                        <span ng-show="bookmarkedPeople.length == 0">
-                            None
-                        </span>
-                        <button id="btnReserve" class="btn btn-default" ng-show="bookmarkedPeople.length > 0">
-                            Reserve / Allocate Selected
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Searching panel -->
                 <div class="col-md-12">
                     <div class="container blue">
                         <div class="col-md-5 text-center">
@@ -275,8 +346,7 @@
             <div class="row same-row">
                 <div class="col-md-10 left-column ">
                     <div class="container">
-
-                        <div id="divMainTable" >
+                        <div id="divMainTable">
 
                             <!-- Table view -->
                             <table class="table" ng-if="!isMapChanged">
@@ -286,11 +356,12 @@
                                             {{field.label}}
                                             <span ng-show="sort.sortColumn == field.fieldName && !sort.sortReverse">▲</span>
                                             <span ng-show="sort.sortColumn == field.fieldName && sort.sortReverse">▼</span>
+                                            <span ng-show="sort.sortColumn != field.fieldName" style="opacity: 0;">▼</span>
                                         </div>
                                         <div ng-click="sort.defaultReverse = !sort.defaultReverse" ng-if="field.type == 'defaultString'" class="withoutPadding textGrey" >
                                             {{field.label}}
-                                            <span ng-show="sort.defaultColumn == field.fieldName && !sort.defaultReverse">▲</span>
-                                            <span ng-show="sort.defaultColumn == field.fieldName && sort.defaultReverse">▼</span>
+                                            <span ng-show="!sort.defaultReverse">▲</span>
+                                            <span ng-show="sort.defaultReverse">▼</span>
                                         </div>
                                     </th>
                                 </thead>
@@ -390,35 +461,31 @@
                                             </div>
 
                                             <div class="row addInfoBookmark">
-                                                <div class="col-md-4 withoutMarge text-center" >
+                                                <div class="col-md-4 withoutMarge text-center" ng-init="selectedProject = allDataFromServer.Projects[1]">
                                                     <label for="slcProjectsForAllocation">Select Project for Allocation:</label>
-                                                    <select id="slcProjectsForAllocation" class="form-control">
-                                                        <option ng-repeat="project in allDataFromServer.Projects">{{project.Name}}</option>
-                                                    </select>
+                                                    <select id="slcProjectsForAllocation" class="form-control" ng-options="project as project.Name for project in allDataFromServer.Projects.slice(1)" ng-model="selectedProject"></select>
                                                 </div>
 
-                                                <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                <div class="col-md-5 withoutMarge text-center form-horizontal" ng-init="dateFrom = $parent.currentDate; dateTo = $parent.currentDate;">
                                                     <label for="dateFrom">From:</label>
-                                                    <input id="dateFrom"  type="date" name="dateFrom" class="form-control" ng-model="dateFrom" />
-                                                </div>
-
-                                                <div class="col-md-2 withoutMarge text-center form-horizontal" >
+                                                    <input id="dateFrom" type="date" name="dateFrom" class="form-control" ng-model="dateFrom"/>
                                                     <label for="dateTo">To:</label>
-                                                    <input id="dateTo"  type="date" name="dateTo" class="form-control" ng-model="dateTo"  />
+                                                    <input id="dateTo" type="date" name="dateTo" class="form-control" ng-model="dateTo"/>
                                                 </div>
 
-                                                <div class="col-md-4 withoutMarge vcenter text-center" >
+                                                <div class="col-md-2 withoutMarge vcenter text-center" ng-init="selectedHours = 8">
                                                     <label for="slcBusyness">Busyness:</label>
-                                                    <select id="slcBusyness" class="form-control">
-                                                        <option >8 Hours</option>
-                                                        <option >4 Hours</option>
-                                                    </select>
-                                                    <button id="btnBookmarkFromAddInfo" class="btn btn-default ">
-                                                        Bookmark
-                                                    </button>
+                                                    <select id="slcBusyness" class="form-control" ng-model="selectedHours" ng-options="hours for hours in [8, 4, 2]"></select>
+                                                </div>
+                                                <div class="col-md-1 withoutMarge vcenter">
+                                                    <div>
+                                                        <button id="btnBookmarkFromAddInfo" class="btn btn-default" ng-click="bookmark(this);" style="height: 2.5em;">
+                                                            Bookmark
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                       </td>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -455,10 +522,10 @@
                         <div id="PaginationBlock" class="row ">
                             <div class="col-md-4 my-col text-left">
                                 <label for="slcRecordsOnPage" >Records on page</label>
-                                <select   ng-model="paginator.developersPerPage"
-                                          ng-options="records for records in paginator.POSSIBLE_DEVELOPERS_PER_PAGE"
-                                          id="slcRecordsOnPage"
-                                          class="form-control">
+                                <select ng-model="paginator.developersPerPage"
+                                        ng-options="records for records in paginator.POSSIBLE_DEVELOPERS_PER_PAGE"
+                                        id="slcRecordsOnPage"
+                                        class="form-control">
                                 </select>
                             </div>
                             <div class="col-md-4 my-col text-center">
@@ -476,10 +543,10 @@
                             </div>
                             <div class="col-md-4 my-col text-right">
                                 <label for="slcPages" >Page</label>
-                                <select   ng-model="paginator.currentPage"
-                                          ng-options="page + 1 for page in paginator.pages()"
-                                          id="slcPages"
-                                          class="form-control">
+                                <select ng-model="paginator.currentPage"
+                                        ng-options="page + 1 for page in paginator.pages()"
+                                        id="slcPages"
+                                        class="form-control">
                                 </select>
                                 <label> of {{paginator.numberOfPages()}} </label>
                             </div>
@@ -737,7 +804,23 @@
                 }, objectIn);
             }
 
+            $scope.currentDate = new Date();
             $scope.bookmarkedPeople = [];
+            $scope.bookmark = function(context) {
+                var newBookmarkEmployee = {
+                    project: context.selectedProject,
+                    dateFrom: context.dateFrom,
+                    dateTo: context.dateTo,
+                    hours: context.selectedHours,
+                    employeeWrapper: context.developer
+                };
+                $scope.bookmarkedPeople.push(newBookmarkEmployee);
+                console.dir($scope.bookmarkedPeople);
+            }
+            $scope.removeBookMark = function(contact) {
+                let index = $scope.bookmarkedPeople.indexOf(contact);
+                $scope.bookmarkedPeople.splice(index, 1);
+            }
 
             $scope.isMapChanged = false;
 
